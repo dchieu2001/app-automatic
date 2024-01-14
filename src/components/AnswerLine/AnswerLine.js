@@ -4,16 +4,16 @@ import { idGenerator } from "../../service/idGenerator";
 import { RadioButton, Text } from 'react-native-paper';
 
 export default function AnswerLine(props) {
-  const { answer } = props;
-  const [value, setValue] = useState(null);
+  const { answer, onChange } = props;
 
   const handlePressCheckbox = (newValue) => {
-    setValue(newValue)
+    if (typeof onChange === "function") {
+      onChange({
+        key: answer.key,
+        value: newValue
+      });
+    }
   }
-
-  useEffect(() => {
-    setValue(answer.value);
-  }, [answer]);
 
   return (
     <View style={styles.container}>
@@ -25,7 +25,7 @@ export default function AnswerLine(props) {
       >
         {answer.key}.
       </Text>
-      <RadioButton.Group onValueChange={handlePressCheckbox} value={value} >
+      <RadioButton.Group onValueChange={handlePressCheckbox} value={answer.value} >
         <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 26 }}>
           <View style={styles.answerItem}>
             <Text>A.</Text>

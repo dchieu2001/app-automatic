@@ -18,6 +18,7 @@ import * as ImagePicker from "expo-image-picker";
 import { supabase } from "../utils/supabase-service";
 import AnswerLine from '../components/AnswerLine/AnswerLine';
 import { idGenerator } from "../service/idGenerator";
+import { useForm, Controller, useFieldArray, useWatch } from "react-hook-form";
 
 function createArrayWithNumbers(length) {
   return Array.from({ length }, (_, i) => i);
@@ -35,6 +36,7 @@ const AnswerKey = ({ route, navigation }) => {
   const [imageFromCamera, setImageFromCamera] = useState(null);
   const [disabled, setDisabled] = useState(false);
   const [isScaningImage, setIsScaningImage] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   // const URLpath =
   //   "http://127.0.0.1:8000/file/upload-answer-key/";
     const serverIp = '192.168.1.10'; // Thay YOUR_SERVER_IP bằng địa chỉ IPv4 của máy tính của bạn
@@ -43,7 +45,23 @@ const AnswerKey = ({ route, navigation }) => {
   const answered = [];
   let ans = [];
 
-  const [answerData, setAnswerData] = useState(null);
+  const { control, handleSubmit, formState: { errors }, reset, getValues } = useForm({
+    defaultValues: {
+      answer: []
+    }
+  });
+  const onSubmit = data => Save(data);
+
+  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray({
+    control, // control props comes from useForm (optional: if you are using FormContext)
+    name: "answer", // unique name for your Field Array
+  });
+
+  const watchAnswer = useWatch({
+    control,
+    name: "answer",
+  })
+
 
   // const loadAnswerd = async () => {
   //   answered.push(
@@ -71,23 +89,31 @@ const AnswerKey = ({ route, navigation }) => {
   //   setAnswered1(answered);
   // };
 
-  // const getAnswered = async () => {
-  //   const { data: answers } = await supabase
-  //     .from("answer_exams")
-  //     .select("answers")
-  //     .eq("exam_id", examId);
-  //   answers.forEach(function (value, key) {
-  //     ans.push({ key, value });
-  //   });
-  //   ans.map((e) => {
-  //     console.log(e.value);
-  //   });
-  // };
+  const getAnswered = async () => {
+    setIsLoading(true);
+    const { data: answers } = await supabase
+      .from("answer_exams")
+      .select("answers")
+      .eq("exam_id", examId);
+      console.log('answers[0].answer', answers[0].answers);
+    if (answers) {
+      reset({
+        answer: answers[0].answers
+      })
+      setIsLoading(false);
+    }
+    // answers.forEach(function (value, key) {
+    //   ans.push({ key, value });
+    // });
+    // ans.map((e) => {
+    //   console.log(e.value);
+    // });
+  };
 
-  // useEffect(() => {
-  //   loadAnswerd();
-  //   getAnswered();
-  // }, [imageFromCamera, imageFromGellary]);
+  useEffect(() => {
+    // loadAnswerd();
+    getAnswered();
+  }, []);
   // select image from gallery
   const pickImage = async () => {
     // try {
@@ -155,7 +181,7 @@ const AnswerKey = ({ route, navigation }) => {
     // }
   };
  
-  const Save = async () => {
+  const Save = async (data) => {
     console.log("click save");
 
     let check = false;
@@ -204,6 +230,10 @@ const AnswerKey = ({ route, navigation }) => {
     //   console.log(e.index + " , " + e.answer);
     // });
 
+    if (!data) {
+      return;
+    }
+
     let { data: answer_exams, err } = await supabase
       .from("answer_exams")
       .select("*")
@@ -214,7 +244,7 @@ const AnswerKey = ({ route, navigation }) => {
         .from("answer_exams")
         .update([
           {
-            answers: answerData.sort(),
+            answers: data.answer.sort(),
           },
         ])
         .eq("exam_id", examId);
@@ -230,7 +260,7 @@ const AnswerKey = ({ route, navigation }) => {
       const { error1 } = await supabase.from("answer_exams").insert([
         {
           exam_id: examId,
-          answers: answerData.sort(),
+          answers: data.answer.sort(),
         },
       ]);
       if (!error1) {
@@ -267,7 +297,9 @@ const AnswerKey = ({ route, navigation }) => {
           },
         });
         console.log('Dữ liệu từ API:', response.data);
-        setAnswerData(response.data)
+        reset({
+          answer: response.data
+        });
       } catch (error) {
         console.error('Lỗi trong yêu cầu axios:', error);
       } finally {
@@ -347,7 +379,7 @@ const AnswerKey = ({ route, navigation }) => {
             minWidth: "10%",
           }}
         >
-          <TouchableOpacity onPress={Save}>
+          <TouchableOpacity onPress={handleSubmit(onSubmit)} disabled={!watchAnswer || watchAnswer?.length < 1}>
             <Text>Save</Text>
           </TouchableOpacity>
         </View>
@@ -530,8 +562,22 @@ const AnswerKey = ({ route, navigation }) => {
                 </View>
               );
             })} */}
-          {Array.isArray(answerData) && answerData.map((item) => <AnswerLine answer={item} key={idGenerator()}/>)}
+          {Array.isArray(fields) && fields.length > 0 && fields.map((field, index) => (
+            <Controller
+              key={field.id}
+              control={control}
+              name={`answer.${index}`}
+              render={({ field: { onChange, onBlur, value, ref } }) => (
+                <AnswerLine
+                  answer={value}
+                  key={idGenerator()}
+                  onChange={onChange}
+                />
+              )}
+            />
+            ))}
           {isScaningImage && <Text>Scaning...</Text>}
+          {isLoading && <Text>Loading...</Text>}
         </View>
       </ScrollView>
     </SafeAreaView>
