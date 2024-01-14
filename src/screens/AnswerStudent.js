@@ -67,7 +67,7 @@ const AnswerStudent = ({ route, navigation }) => {
   //   "https://84de-2401-d800-9d51-f301-7185-811a-1244-bb2a.ap.ngrok.io/file/upload-answer-student/";
   // const URLpath =
   //   "http://127.0.0.1:8000/file/upload-answer-key/";
-  const serverIp = '192.168.1.246'; // Thay YOUR_SERVER_IP bằng địa chỉ IPv4 của máy tính của bạn
+  const serverIp = '192.168.1.10'; // Thay YOUR_SERVER_IP bằng địa chỉ IPv4 của máy tính của bạn
   const serverUrl = `http://${serverIp}:8000/file/upload-answer-student/`;
   const getAnswerKeyAndScale = async () => {
     let { data: answer_exams, error } = await supabase

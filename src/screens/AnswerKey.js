@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { axiosInstance } from "../service/axios";
 import {
   SafeAreaView,
   StyleSheet,
@@ -16,6 +16,8 @@ import { theme } from "../core/theme";
 import { CheckBox } from "react-native-elements";
 import * as ImagePicker from "expo-image-picker";
 import { supabase } from "../utils/supabase-service";
+import AnswerLine from '../components/AnswerLine/AnswerLine';
+import { idGenerator } from "../service/idGenerator";
 
 function createArrayWithNumbers(length) {
   return Array.from({ length }, (_, i) => i);
@@ -32,57 +34,60 @@ const AnswerKey = ({ route, navigation }) => {
   const [imageFromGellary, setImageFromGellary] = useState(null);
   const [imageFromCamera, setImageFromCamera] = useState(null);
   const [disabled, setDisabled] = useState(false);
+  const [isScaningImage, setIsScaningImage] = useState(false);
   // const URLpath =
   //   "http://127.0.0.1:8000/file/upload-answer-key/";
-    const serverIp = '192.168.1.246'; // Thay YOUR_SERVER_IP bằng địa chỉ IPv4 của máy tính của bạn
-    const serverUrl = `http://${serverIp}:8000/file/upload-answer-key/`;
+    const serverIp = '192.168.1.10'; // Thay YOUR_SERVER_IP bằng địa chỉ IPv4 của máy tính của bạn
+    const serverUrl = `/file/upload-answer-key/`;
   const [answered1, setAnswered1] = useState([]);
   const answered = [];
   let ans = [];
 
-  const loadAnswerd = async () => {
-    answered.push(
-      { index: 1, answer: "A" },
-      { index: 2, answer: "B" },
-      { index: 3, answer: "C" },
-      { index: 4, answer: "D" },
-      { index: 5, answer: "A" },
-      { index: 6, answer: "A" },
-      { index: 7, answer: "B" },
-      { index: 8, answer: "C" },
-      { index: 9, answer: "D" },
-      { index: 10, answer: "A" },
-      { index: 11, answer: "A" },
-      { index: 12, answer: "B" },
-      { index: 13, answer: "C" },
-      { index: 14, answer: "D" },
-      { index: 15, answer: "A" },
-      { index: 16, answer: "A" },
-      { index: 17, answer: "B" },
-      { index: 18, answer: "C" },
-      { index: 19, answer: "D" },
-      { index: 20, answer: "A" }
-    );
-    setAnswered1(answered);
-  };
+  const [answerData, setAnswerData] = useState(null);
 
-  const getAnswered = async () => {
-    const { data: answers } = await supabase
-      .from("answer_exams")
-      .select("answers")
-      .eq("exam_id", examId);
-    answers.forEach(function (value, key) {
-      ans.push({ key, value });
-    });
-    ans.map((e) => {
-      console.log(e.value);
-    });
-  };
+  // const loadAnswerd = async () => {
+  //   answered.push(
+  //     { index: 1, answer: "A" },
+  //     { index: 2, answer: "B" },
+  //     { index: 3, answer: "C" },
+  //     { index: 4, answer: "D" },
+  //     { index: 5, answer: "A" },
+  //     { index: 6, answer: "A" },
+  //     { index: 7, answer: "B" },
+  //     { index: 8, answer: "C" },
+  //     { index: 9, answer: "D" },
+  //     { index: 10, answer: "A" },
+  //     { index: 11, answer: "A" },
+  //     { index: 12, answer: "B" },
+  //     { index: 13, answer: "C" },
+  //     { index: 14, answer: "D" },
+  //     { index: 15, answer: "A" },
+  //     { index: 16, answer: "A" },
+  //     { index: 17, answer: "B" },
+  //     { index: 18, answer: "C" },
+  //     { index: 19, answer: "D" },
+  //     { index: 20, answer: "A" }
+  //   );
+  //   setAnswered1(answered);
+  // };
 
-  useEffect(() => {
-    loadAnswerd();
-    getAnswered();
-  }, [imageFromCamera, imageFromGellary]);
+  // const getAnswered = async () => {
+  //   const { data: answers } = await supabase
+  //     .from("answer_exams")
+  //     .select("answers")
+  //     .eq("exam_id", examId);
+  //   answers.forEach(function (value, key) {
+  //     ans.push({ key, value });
+  //   });
+  //   ans.map((e) => {
+  //     console.log(e.value);
+  //   });
+  // };
+
+  // useEffect(() => {
+  //   loadAnswerd();
+  //   getAnswered();
+  // }, [imageFromCamera, imageFromGellary]);
   // select image from gallery
   const pickImage = async () => {
     // try {
@@ -149,78 +154,6 @@ const AnswerKey = ({ route, navigation }) => {
     //   console.warn(err);
     // }
   };
-
-  const RenderItem = (props) => {
-    const [A, setA] = useState(props.answer === "A" ? true : false);
-    const [B, setB] = useState(props.answer === "B" ? true : false);
-    const [C, setC] = useState(props.answer === "C" ? true : false);
-    const [D, setD] = useState(props.answer === "D" ? true : false);
-    const checkedA = () => {
-      setA(true);
-      setB(false);
-      setC(false);
-      setD(false);
-      arr.set(props.index, "A");
-    };
-    const checkedB = () => {
-      setA(false);
-      setB(true);
-      setC(false);
-      setD(false);
-      arr.set(props.index, "B");
-    };
-
-    const checkedC = () => {
-      setA(false);
-      setB(false);
-      setC(true);
-      setD(false);
-      arr.set(props.index, "C");
-    };
-    const checkedD = () => {
-      setA(false);
-      setB(false);
-      setC(false);
-      setD(true);
-      arr.set(props.index, "D");
-    };
-    return (
-      <View style={{ flexDirection: "row" }}>
-        <CheckBox
-          title="A"
-          center
-          checked={A}
-          checkedIcon="dot-circle-o"
-          uncheckedIcon="circle-o"
-          onPress={checkedA}
-        />
-        <CheckBox
-          title="B"
-          center
-          checked={B}
-          checkedIcon="dot-circle-o"
-          uncheckedIcon="circle-o"
-          onPress={checkedB}
-        />
-        <CheckBox
-          title="C"
-          center
-          checked={C}
-          checkedIcon="dot-circle-o"
-          uncheckedIcon="circle-o"
-          onPress={checkedC}
-        />
-        <CheckBox
-          title="D"
-          center
-          checked={D}
-          checkedIcon="dot-circle-o"
-          uncheckedIcon="circle-o"
-          onPress={checkedD}
-        />
-      </View>
-    );
-  };
  
   const Save = async () => {
     console.log("click save");
@@ -231,44 +164,45 @@ const AnswerKey = ({ route, navigation }) => {
       ans.push({ key, value });
     });
 
-    if (imageFromCamera !== null) {
-      check = true;
-      setDisabled(true);
-      urlImage = imageFromCamera;
-    }
-    if (imageFromGellary !== null) {
-      check = true;
-      setDisabled(true);
-      urlImage = imageFromGellary;
-    }
-    let match = /\.(\w+)$/.exec(urlImage);
-    let type = match ? `image/${match[1]}` : `image`;
-    if (check) {
-      const formData = new FormData();
-      formData.append("file", {
-        uri: urlImage,
-        name: urlImage.split("/").pop(),
-        type: type,
-      });
-      try {
-        const response = await axios.post(serverUrl, formData, {
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        console.log('Dữ liệu từ API:', response.data);
-      } catch (error) {
-        console.error('Lỗi trong yêu cầu axios:', error);
-      }
-    }
+    // if (imageFromCamera !== null) {
+    //   check = true;
+    //   setDisabled(true);
+    //   urlImage = imageFromCamera;
+    // }
+    // if (imageFromGellary !== null) {
+    //   check = true;
+    //   setDisabled(true);
+    //   urlImage = imageFromGellary;
+    // }
+    // let match = /\.(\w+)$/.exec(urlImage);
+    // let type = match ? `image/${match[1]}` : `image`;
+    // if (check) {
+    //   const formData = new FormData();
+    //   formData.append("file", {
+    //     uri: urlImage,
+    //     name: urlImage.split("/").pop(),
+    //     type: type,
+    //   });
+    //   try {
+    //     const response = await axiosInstance.post(serverUrl, formData, {
+    //       headers: {
+    //         'Accept': 'application/json',
+    //         'Content-Type': 'multipart/form-data',
+    //       },
+    //     });
+    //     console.log('Dữ liệu từ API:', response.data);
+    //     setAnswerData(response.data)
+    //   } catch (error) {
+    //     console.error('Lỗi trong yêu cầu axios:', error);
+    //   }
+    // }
 
 
 
     
-    answered.map((e) => {
-      console.log(e.index + " , " + e.answer);
-    });
+    // answered.map((e) => {
+    //   console.log(e.index + " , " + e.answer);
+    // });
 
     let { data: answer_exams, err } = await supabase
       .from("answer_exams")
@@ -280,7 +214,7 @@ const AnswerKey = ({ route, navigation }) => {
         .from("answer_exams")
         .update([
           {
-            answers: ans.sort(),
+            answers: answerData.sort(),
           },
         ])
         .eq("exam_id", examId);
@@ -296,7 +230,7 @@ const AnswerKey = ({ route, navigation }) => {
       const { error1 } = await supabase.from("answer_exams").insert([
         {
           exam_id: examId,
-          answers: ans.sort(),
+          answers: answerData.sort(),
         },
       ]);
       if (!error1) {
@@ -310,6 +244,52 @@ const AnswerKey = ({ route, navigation }) => {
     }
   };
 
+  const scanImage = async (imageData) => {
+    if (imageData === null) {
+      return;
+    }
+    setIsScaningImage(true);
+    let urlImage = imageData;
+    let match = /\.(\w+)$/.exec(urlImage);
+    let type = match ? `image/${match[1]}` : `image`;
+    if (urlImage && type) {
+      const formData = new FormData();
+      formData.append("file", {
+        uri: urlImage,
+        name: urlImage.split("/").pop(),
+        type: type,
+      });
+      try {
+        const response = await axiosInstance.post(serverUrl, formData, {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        console.log('Dữ liệu từ API:', response.data);
+        setAnswerData(response.data)
+      } catch (error) {
+        console.error('Lỗi trong yêu cầu axios:', error);
+      } finally {
+        setIsScaningImage(false);
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (imageFromGellary) {
+      setImageFromCamera(null);
+      scanImage(imageFromGellary);
+    }
+  }, [imageFromGellary]);
+
+  useEffect(() => {
+    if (imageFromCamera) {
+      setImageFromGellary(null);
+      scanImage(imageFromCamera);
+    }
+  }, [imageFromCamera]);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       {/* header */}
@@ -319,7 +299,7 @@ const AnswerKey = ({ route, navigation }) => {
           flexDirection: "row",
           alignContent: "center",
           paddingLeft: 20,
-          paddingTop: 30,
+          paddingTop: 100,
           minWidth: "100%",
           backgroundColor: theme.colors.background,
         }}
@@ -523,62 +503,35 @@ const AnswerKey = ({ route, navigation }) => {
 
       <ScrollView style={{ width: "100%" }}>
         <View style={styles.container}>
-          <View style={styles.box}>
-            {!disabled &&
-              createArrayWithNumbers(examOptions).map((index) => {
-                return (
-                  <View style={{ flexDirection: "row" }} key={index + 1}>
-                    <View
+          {/* {!disabled &&
+            createArrayWithNumbers(examOptions).map((index) => {
+              return (
+                <View style={{ flexDirection: "row" }} key={index + 1}>
+                  <View
+                    style={{
+                      flexDirection: "column",
+                      alignContent: "center",
+                      justifyContent: "center",
+                      fontSize: 20,
+                      width: "9%",
+                    }}
+                  >
+                    <Text
                       style={{
-                        flexDirection: "column",
-                        alignContent: "center",
-                        justifyContent: "center",
-                        fontSize: 20,
-                        width: "9%",
+                        fontSize: 18,
                       }}
                     >
-                      <Text
-                        style={{
-                          fontSize: 18,
-                        }}
-                      >
-                        {index + 1}.
-                      </Text>
-                    </View>
-                    <View style={{ flexDirection: "column", marginLeft: -10 }}>
-                      <RenderItem index={index + 1} />
-                    </View>
+                      {index + 1}.
+                    </Text>
                   </View>
-                );
-              })}
-            {disabled &&
-              answered1.map((e) => {
-                return (
-                  <View style={{ flexDirection: "row" }} key={e.index}>
-                    <View
-                      style={{
-                        flexDirection: "column",
-                        alignContent: "center",
-                        justifyContent: "center",
-                        fontSize: 20,
-                        width: "7%",
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 18,
-                        }}
-                      >
-                        {e.index}.
-                      </Text>
-                    </View>
-                    <View style={{ flexDirection: "column" }}>
-                      <RenderItem index={e.index} answer={e.answer} />
-                    </View>
+                  <View style={{ flexDirection: "column", marginLeft: -10 }}>
+                    <AnswerLine index={index + 1} />
                   </View>
-                );
-              })}
-          </View>
+                </View>
+              );
+            })} */}
+          {Array.isArray(answerData) && answerData.map((item) => <AnswerLine answer={item} key={idGenerator()}/>)}
+          {isScaningImage && <Text>Scaning...</Text>}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -590,12 +543,7 @@ export default AnswerKey;
 const styles = StyleSheet.create({
   container: {
     marginTop: 20,
-  },
-  box: {
-    // marginLeft: "10%",
-    paddingLeft: 7,
+    paddingHorizontal: 50,
     width: "100%",
-    // marginRight: "10%",
-    flexDirection: "column",
-  },
+  }
 });
