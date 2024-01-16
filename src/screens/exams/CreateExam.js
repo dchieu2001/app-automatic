@@ -282,7 +282,7 @@ const CreateExam = ({ navigation }) => {
           {/* enter name exam */}
           <View style={styles.box}>
             <TextInput
-              keyboardType="text"
+              keyboardType="default"
               label="Name Exam *"
               returnKeyType="next"
               value={name.value}
@@ -472,7 +472,7 @@ const CreateExam = ({ navigation }) => {
                 onChangeText={(date) => setDate({ value: date, error: "" })}
                 error={!!date.error}
                 errorText={date.error}
-                keyboardType="datetime"
+                keyboardType="default"
               ></TextInput>
             </View>
 
@@ -517,7 +517,7 @@ const CreateExam = ({ navigation }) => {
               onChangeText={(text) =>
                 setDescription({ value: text, error: "" })
               }
-              keyboardType="text"
+              keyboardType="default"
             ></TextInput>
           </View>
           {/* button handle */}

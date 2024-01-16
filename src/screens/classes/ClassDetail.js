@@ -47,27 +47,45 @@ const ClassDetail = ({ route, navigation }) => {
 
   // number exams of a class
   const updateNumberExamOfClass = async () => {
-    let { data: exams, error } = await supabase
-      .from("exams")
-      .select("count()")
-      .eq("is_delete", false)
-      .eq("class_id", classId);
-
-    exams[0].count > 0 ? setNumberExam(exams[0].count) : setNumberExam(0);
+    try {
+      let { data: exams, error } = await supabase
+        .from("exams")
+        .select()
+        .eq("is_delete", false)
+        .eq("class_id", classId);
+  
+      if (exams && Array.isArray(exams)) {
+        setNumberExam(exams.length);
+      } else {
+        console.error("Invalid data returned:", exams);
+        setNumberExam(0); // Đặt giá trị mặc định là 0 nếu có lỗi hoặc dữ liệu không hợp lệ
+      }
+    } catch (error) {
+      console.error("Error updating number of exams:", error);
+      setNumberExam(0); // Xử lý lỗi và đặt giá trị mặc định là 0
+    }
   };
-
   // number students of a class
   const updateNumberStudentOfClass = async () => {
-    let { data: students, error } = await supabase
-      .from("students")
-      .select("count()")
-      .eq("is_delete", false)
-      .eq("class_id", classId);
-
-    students[0].count > 0
-      ? setNumberStudent(students[0].count)
-      : setNumberStudent(0);
+    try {
+      let { data: students, error } = await supabase
+        .from("students")
+        .select()
+        .eq("is_delete", false)
+        .eq("class_id", classId);
+  
+      if (students && Array.isArray(students)) {
+        setNumberStudent(students.length);
+      } else {
+        console.error("Invalid data returned:", students);
+        setNumberStudent(0); // Đặt giá trị mặc định là 0 nếu có lỗi hoặc dữ liệu không hợp lệ
+      }
+    } catch (error) {
+      console.error("Error updating number of students:", error);
+      setNumberStudent(0); // Xử lý lỗi và đặt giá trị mặc định là 0
+    }
   };
+  
 
   const loadClassDetail = async () => {
     let { data: classes, error } = await supabase
@@ -396,7 +414,7 @@ const ClassDetail = ({ route, navigation }) => {
                 </View>
 
                 <View style={styles.manage}>
-                  <Text style={{ fontsize: 12, color: theme.colors.label }}>
+                  <Text style={{ fontSize: 12, color: theme.colors.label }}>
                     Manage
                   </Text>
                 </View>
@@ -409,7 +427,7 @@ const ClassDetail = ({ route, navigation }) => {
                         width: 28,
                         height: 28,
                         backgroundColor: theme.colors.primary,
-                        color: theme.colors.white,
+                        tintColor: theme.colors.white,
                       }}
                     />
                   </View>
@@ -430,8 +448,7 @@ const ClassDetail = ({ route, navigation }) => {
                         width: 20,
                         height: 20,
                         paddingLeft: "112%",
-                        elevation: 0,
-                        color: theme.colors.label,
+                        tintColor: theme.colors.label,
                       }}
                     />
                   </View>
@@ -473,8 +490,7 @@ const ClassDetail = ({ route, navigation }) => {
                         width: 20,
                         height: 20,
                         paddingLeft: "109%",
-                        elevation: 0,
-                        color: theme.colors.label,
+                        tintColor: theme.colors.label,
                       }}
                     />
                   </View>
