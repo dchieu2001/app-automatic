@@ -35,7 +35,7 @@ const ExamScreen = ({ navigation }) => {
   useEffect(() => {
     setLoading(false);
     loadExams();
-  }, [navigation, loadExams]);
+  }, []);
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ minHeight: "90%" }}>

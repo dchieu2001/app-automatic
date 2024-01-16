@@ -378,13 +378,22 @@ const ExamDetail = ({ route, navigation }) => {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.btn}
+              // onPress={() =>
+              //   navigation.navigate("AnswerStudent", {
+              //     id: examId,
+              //     scale: exam[0].scale,
+              //     class_id: exam[0].class_id,
+              //     name: exam[0].name,
+              //     options: exam[0].option,
+              //   })
+              // }
               onPress={() =>
-                navigation.navigate("AnswerStudent", {
-                  id: examId,
-                  scale: exam[0].scale,
-                  class_id: exam[0].class_id,
-                  name: exam[0].name,
-                  options: exam[0].option,
+                navigation.navigate("ListStudentByClass", {
+                  classId: exam[0].class_id,
+                  examId: examId,
+                  examScale: exam[0].scale,
+                  examName: exam[0].name,
+                  examOptions: exam[0].option,
                 })
               }
             >

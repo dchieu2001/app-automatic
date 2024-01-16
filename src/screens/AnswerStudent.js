@@ -1,3 +1,4 @@
+import { axiosInstance } from "../service/axios";
 import {
   SafeAreaView,
   StyleSheet,
@@ -16,6 +17,9 @@ import { CheckBox } from "react-native-elements";
 import * as ImagePicker from "expo-image-picker";
 import { supabase } from "../utils/supabase-service";
 import TextInput from "../components/TextInput";
+import AnswerLine from '../components/AnswerLine/AnswerLine';
+import { idGenerator } from "../service/idGenerator";
+import { useForm, Controller, useFieldArray, useWatch } from "react-hook-form";
 
 function createArrayWithNumbers(length) {
   return Array.from({ length }, (_, i) => i);
@@ -27,6 +31,7 @@ const AnswerStudent = ({ route, navigation }) => {
   const examOptions = route.params.options;
   const scale = route.params.scale;
   const classId = route.params.class_id;
+  const studentId = route.params.studentId;
   const currentUser = supabase.auth.user();
   // const [studentId, setStudentId] = useState({ value: "", error: "" });
   const [disabled, setDisabled] = useState(false);
@@ -34,6 +39,8 @@ const AnswerStudent = ({ route, navigation }) => {
   let arr = new Map();
   const [imageFromGellary, setImageFromGellary] = useState(null);
   const [imageFromCamera, setImageFromCamera] = useState(null);
+  const [isScaningImage, setIsScaningImage] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [answered1, setAnswered1] = useState([]);
   const answered = [];
 
@@ -68,22 +75,49 @@ const AnswerStudent = ({ route, navigation }) => {
   // const URLpath =
   //   "http://127.0.0.1:8000/file/upload-answer-key/";
   const serverIp = '192.168.1.10'; // Thay YOUR_SERVER_IP bằng địa chỉ IPv4 của máy tính của bạn
-  const serverUrl = `http://${serverIp}:8000/file/upload-answer-student/`;
-  const getAnswerKeyAndScale = async () => {
-    let { data: answer_exams, error } = await supabase
-      .from("answer_exams")
-      .select(`answers, exams(id, is_delete)`)
-      .eq("exam_id", examId)
-      .eq("exams.is_delete", false);
-    setAnswerKey(answer_exams[0].answers);
+  const serverUrl = `/file/upload-answer-student/`;
+
+  const { control, handleSubmit, formState: { errors }, reset, getValues } = useForm({
+    defaultValues: {
+      answer: []
+    }
+  });
+  const onSubmit = data => Save(data);
+
+  const { fields, append, prepend, remove, swap, move, insert } = useFieldArray({
+    control, // control props comes from useForm (optional: if you are using FormContext)
+    name: "answer", // unique name for your Field Array
+  });
+
+  const watchAnswer = useWatch({
+    control,
+    name: "answer",
+  })
+
+
+
+
+
+  const getAnswerKeyOfStudent = async () => {
+    setIsLoading(true);
+    let { data: answers, error } = await supabase
+      .from("answer_students")
+      .select(`answers`)
+      .eq("student_id", studentId)
+    console.log('answer', answers);
+    
+    if (Array.isArray(answers) && answers?.[0]) {
+      reset({
+        answer: answers[0].answers
+      })
+      setIsLoading(false);
+    }
+    // setAnswerKey(answer_exams[0].answers);
   };
 
   useEffect(() => {
-    getAnswerKeyAndScale();
-    setTimeout(async () => {
-      loadAnswerd();
-    }, 1000);
-  }, [imageFromCamera, imageFromGellary]);
+    getAnswerKeyOfStudent();
+  }, []);
   // select image from gallery
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -93,14 +127,17 @@ const AnswerStudent = ({ route, navigation }) => {
       quality: 1,
     });
   
-    if (!result.cancelled) {
-      // Access the selected assets from the assets array
-      const selectedAssets = result.assets;
+    if (!result.canceled) {
+      // // Access the selected assets from the assets array
+      // const selectedAssets = result.assets;
   
-      // Assuming you want the URI of the first selected asset
-      const firstAssetUri = selectedAssets.length > 0 ? selectedAssets[0].uri : null;
+      // // Assuming you want the URI of the first selected asset
+      // const firstAssetUri = selectedAssets.length > 0 ? selectedAssets[0].uri : null;
   
-      setImageFromGellary(firstAssetUri);
+      // setImageFromGellary(firstAssetUri);
+      const selectedImage = result.assets[0];
+      setImageFromCamera(null);
+      setImageFromGellary(selectedImage.uri);
     }
   };
 
@@ -118,7 +155,7 @@ const AnswerStudent = ({ route, navigation }) => {
     }
   };
 
-  const Save = async () => {
+  const Save = async (data) => {
     console.log("click save");
     let check = false;
     let ans = [];
@@ -128,59 +165,29 @@ const AnswerStudent = ({ route, navigation }) => {
       ans.push({ key, value });
     });
 
-    if (imageFromCamera !== null) {
-      check = true;
-      setDisabled(true);
-      urlImage = imageFromCamera;
-    }
-    if (imageFromGellary !== null) {
-      check = true;
-      setDisabled(true);
-      urlImage = imageFromGellary;
+    if (!data) {
+      return;
     }
 
-    let match = /\.(\w+)$/.exec(urlImage);
-    let type = match ? `image/${match[1]}` : `image`;
-    if (check) {
-      const formData = new FormData();
-      formData.append("file", {
-        uri: urlImage,
-        name: urlImage.split("/").pop(),
-        type: type,
-      });
-      try {
-        const response = await axios.post(serverUrl, formData, {
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        console.log('Dữ liệu từ API:', response.data);
-      } catch (error) {
-        console.error('Lỗi trong yêu cầu axios:', error);
-      }
-    }
-
-    answered.map((e) => {
-      console.log(e.index + " , " + e.answer);
-    });
 
     // check answer is correct!
-    arr.forEach(function (value, key) {
-      ans.push({ key, value });
-      if (value === answerKey[key]) {
-        count++;
-      }
-    });
+    // arr.forEach(function (value, key) {
+    //   ans.push({ key, value });
+    //   if (value === answerKey[key]) {
+    //     count++;
+    //   }
+    // });
 
     let { data: students, error } = await supabase
-      .from("students")
-      .select("id, student_code")
-      .eq("class_id", classId);
+      .from("answer_students")
+      .select("*")
+      .eq("exam_id", examId)
+      .eq("student_id", studentId);
+    console.log('studentas', students);
     // students.filter(e=> {
     //   if()
     // })
-    console.log(students);
+    // console.log(students);
     // check student_code
     if (students[0]) {
       const { error1 } = await supabase
@@ -188,11 +195,11 @@ const AnswerStudent = ({ route, navigation }) => {
         .update([
           {
             exam_id: examId,
-            answers: ans.sort(),
+            answers: data.answer.sort(),
             point: (count * scale).toFixed(1),
           },
         ])
-        .eq("student_id", students[0].id);
+        .eq("student_id", studentId);
 
       if (error1) {
         Alert.alert("Failed!", "Update answer of student failed!", [
@@ -213,8 +220,8 @@ const AnswerStudent = ({ route, navigation }) => {
       const { error1 } = await supabase.from("answer_students").insert([
         {
           exam_id: examId,
-          student_id: students[0].id,
-          answers: ans.sort(),
+          student_id: studentId,
+          answers: data.answer.sort(),
           point: (count * scale).toFixed(1),
         },
       ]);
@@ -237,77 +244,53 @@ const AnswerStudent = ({ route, navigation }) => {
     }
   };
 
-  const RenderItem = (props) => {
-    const [A, setA] = useState(props.answer === "A" ? true : false);
-    const [B, setB] = useState(props.answer === "B" ? true : false);
-    const [C, setC] = useState(props.answer === "C" ? true : false);
-    const [D, setD] = useState(props.answer === "D" ? true : false);
-    const checkedA = () => {
-      setA(true);
-      setB(false);
-      setC(false);
-      setD(false);
-      arr.set(props.index, "A");
-    };
-    const checkedB = () => {
-      setA(false);
-      setB(true);
-      setC(false);
-      setD(false);
-      arr.set(props.index, "B");
-    };
+  const scanImage = async (imageData) => {
+    if (imageData === null) {
+      return;
+    }
+    setIsScaningImage(true);
+    let urlImage = imageData;
+    let match = /\.(\w+)$/.exec(urlImage);
+    let type = match ? `image/${match[1]}` : `image`;
+    if (urlImage && type) {
+      const formData = new FormData();
+      formData.append("file", {
+        uri: urlImage,
+        name: urlImage.split("/").pop(),
+        type: type,
+      });
+      try {
+        const response = await axiosInstance.post(serverUrl, formData, {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        console.log('Dữ liệu từ API:', response.data);
+        reset({
+          answer: response.data
+        });
+      } catch (error) {
+        console.error('Lỗi trong yêu cầu axios:', error);
+      } finally {
+        setIsScaningImage(false);
+      }
+    }
+  }
 
-    const checkedC = () => {
-      setA(false);
-      setB(false);
-      setC(true);
-      setD(false);
-      arr.set(props.index, "C");
-    };
-    const checkedD = () => {
-      setA(false);
-      setB(false);
-      setC(false);
-      setD(true);
-      arr.set(props.index, "D");
-    };
-    return (
-      <View style={{ flexDirection: "row" }}>
-        <CheckBox
-          title="A"
-          center
-          checked={A}
-          checkedIcon="dot-circle-o"
-          uncheckedIcon="circle-o"
-          onPress={checkedA}
-        />
-        <CheckBox
-          title="B"
-          center
-          checked={B}
-          checkedIcon="dot-circle-o"
-          uncheckedIcon="circle-o"
-          onPress={checkedB}
-        />
-        <CheckBox
-          title="C"
-          center
-          checked={C}
-          checkedIcon="dot-circle-o"
-          uncheckedIcon="circle-o"
-          onPress={checkedC}
-        />
-        <CheckBox
-          title="D"
-          center
-          checked={D}
-          checkedIcon="dot-circle-o"
-          uncheckedIcon="circle-o"
-          onPress={checkedD}
-        />
-      </View>
-    );
-  };
+  useEffect(() => {
+    if (imageFromGellary) {
+      setImageFromCamera(null);
+      scanImage(imageFromGellary);
+    }
+  }, [imageFromGellary]);
+
+  useEffect(() => {
+    if (imageFromCamera) {
+      setImageFromGellary(null);
+      scanImage(imageFromCamera);
+    }
+  }, [imageFromCamera]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
@@ -318,7 +301,7 @@ const AnswerStudent = ({ route, navigation }) => {
           flexDirection: "row",
           alignContent: "center",
           paddingLeft: 20,
-          paddingTop: 30,
+          paddingTop: 100,
           minWidth: "100%",
           backgroundColor: theme.colors.background,
         }}
@@ -366,7 +349,7 @@ const AnswerStudent = ({ route, navigation }) => {
             minWidth: "10%",
           }}
         >
-          <TouchableOpacity onPress={Save}>
+          <TouchableOpacity onPress={handleSubmit(onSubmit)} disabled={!watchAnswer || watchAnswer?.length < 1}>
             <Text>Save</Text>
           </TouchableOpacity>
         </View>
@@ -522,105 +505,22 @@ const AnswerStudent = ({ route, navigation }) => {
 
       <ScrollView style={{ width: "100%" }}>
         <View style={styles.container}>
-          {/* <View style={{ marginHorizontal: 50, marginBottom: 20 }}>
-            <TextInput
-              label="Student Code"
-              returnKeyType="done"
-              value={studentId.value}
-              onChangeText={(text) => setStudentId({ value: text, error: "" })}
-              error={!!studentId.error}
-              errorText={studentId.error}
-              autoCapitalize="none"
-              autoCompleteType="off"
-              style={{ padding: 0, height: 30 }}
+          {Array.isArray(fields) && fields.length > 0 && fields.map((field, index) => (
+            <Controller
+              key={field.id}
+              control={control}
+              name={`answer.${index}`}
+              render={({ field: { onChange, onBlur, value, ref } }) => (
+                <AnswerLine
+                  answer={value}
+                  key={idGenerator()}
+                  onChange={onChange}
+                />
+              )}
             />
-          </View> */}
-          <View style={styles.box}>
-            {/* {createArrayWithNumbers(examOptions).map((index) => {
-              return (
-                <View style={{ flexDirection: "row" }} key={index + 1}>
-                  <View
-                    style={{
-                      flexDirection: "column",
-                      alignContent: "center",
-                      justifyContent: "center",
-                      fontSize: 20,
-                      width: "7%",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontSize: 18,
-                      }}
-                    >
-                      {index + 1}.
-                    </Text>
-                  </View>
-                  <View style={{ flexDirection: "column" }}>
-                    <RenderItem index={index + 1} />
-                  </View>
-                </View>
-              );
-            })} */}
-
-            {/* answer when instructor input manual */}
-            {!disabled &&
-              createArrayWithNumbers(examOptions).map((index) => {
-                return (
-                  <View style={{ flexDirection: "row" }} key={index + 1}>
-                    <View
-                      style={{
-                        flexDirection: "column",
-                        alignContent: "center",
-                        justifyContent: "center",
-                        fontSize: 20,
-                        width: "7%",
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 18,
-                        }}
-                      >
-                        {index + 1}.
-                      </Text>
-                    </View>
-                    <View style={{ flexDirection: "column" }}>
-                      <RenderItem index={index + 1} />
-                    </View>
-                  </View>
-                );
-              })}
-
-            {/* answer when instructor input from file */}
-            {disabled &&
-              answered1.map((e) => {
-                return (
-                  <View style={{ flexDirection: "row" }} key={e.index}>
-                    <View
-                      style={{
-                        flexDirection: "column",
-                        alignContent: "center",
-                        justifyContent: "center",
-                        fontSize: 20,
-                        width: "7%",
-                      }}
-                    >
-                      <Text
-                        style={{
-                          fontSize: 18,
-                        }}
-                      >
-                        {e.index}.
-                      </Text>
-                    </View>
-                    <View style={{ flexDirection: "column" }}>
-                      <RenderItem index={e.index} answer={e.answer} />
-                    </View>
-                  </View>
-                );
-              })}
-          </View>
+            ))}
+          {isScaningImage && <Text>Scaning...</Text>}
+          {isLoading && <Text>Loading...</Text>}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -632,12 +532,7 @@ export default AnswerStudent;
 const styles = StyleSheet.create({
   container: {
     marginTop: 20,
-  },
-  box: {
-    // marginLeft: "10%",
-    paddingLeft: 5,
+    paddingHorizontal: 50,
     width: "100%",
-    // marginRight: "10%",
-    flexDirection: "column",
-  },
+  }
 });

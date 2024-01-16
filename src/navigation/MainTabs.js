@@ -21,6 +21,7 @@ import {
   ListExamByClass,
   StudentDetail,
   CreateExamByClass,
+  ListStudentByClass
 } from "../screens";
 import TabBottom from "../components/TabBottom";
 
@@ -42,6 +43,7 @@ export default function () {
       <Stack.Screen name="AnswerStudent" component={AnswerStudent} />
       <Stack.Screen name="CreateStudent" component={CreateStudent} />
       <Stack.Screen name="StudentScreen" component={StudentScreen} />
+      <Stack.Screen name="ListStudentByClass" component={ListStudentByClass} />
       <Stack.Screen name="ExamDetail" component={ExamDetail} />
       <Stack.Screen name="ClassDetail" component={ClassDetail} />
       <Stack.Screen name="ClassScreen" component={ClassScreen} />

@@ -18,6 +18,7 @@ export { default as ExamScreen } from "./exams/ExamScreen";
 export { default as StudentScreen } from "./students/StudentScreen";
 export { default as CreateStudent } from "./students/CreateStudent";
 export { default as StudentDetail } from "./students/StudentDetail";
+export { default as ListStudentByClass } from "./students/ListStudentByClass";
 
 // in progress
 export { default as AnswerStudent } from "./AnswerStudent";
