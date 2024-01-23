@@ -1,108 +1,69 @@
-import React, { useEffect, useState } from "react";
+// Result.js
+import React, { useEffect, useState } from 'react';
 import {
   StyleSheet,
   Text,
   View,
   SafeAreaView,
-  Alert,
   FlatList,
   TouchableOpacity,
   Image,
-} from "react-native";
-import { DataTable } from "react-native-paper";
-import Button from "../components/Button";
-import { theme } from "../core/theme";
-import { supabase } from "../utils/supabase-service";
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { supabase } from '../utils/supabase-service';
 
-const Result = ({ route, navigation }) => {
+const Result = ({ route }) => {
+  const navigation = useNavigation();
   const class_id = route.params.id;
   const [results, setResults] = useState([]);
 
   const loadResults = async () => {
     const { data: result, error } = await supabase
-      .from("answer_students")
-      .select("*, students(full_name, student_code)")
-      .eq("students.is_delete", false)
-      .eq("students.class_id", class_id);
+      .from('answer_students')
+      .select('*, students(full_name, student_code)')
+      .eq('students.is_delete', false)
+      .eq('students.class_id', class_id);
     setResults(result);
   };
 
   useEffect(() => {
     loadResults();
   }, []);
+
+  const navigateToDetail = (studentCode, fullName, point) => {
+    navigation.navigate('DetailAnswerStudents', {
+      studentCode,
+      fullName,
+      point,
+    });
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <View
-        style={{
-          flexDirection: "row",
-          alignContent: "center",
-          paddingLeft: 20,
-          paddingTop: 30,
-          minWidth: "100%",
-          backgroundColor: theme.colors.background,
-        }}
-      >
+      <View style={styles.header}>
         <TouchableOpacity
-          onPress={navigation.goBack}
-          style={{
-            flexDirection: "column",
-            alignContent: "center",
-            minWidth: "30%",
-          }}
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
         >
           <Image
-            source={require("../assets/arrow_back.png")}
-            style={{
-              width: 24,
-              height: 24,
-            }}
+            source={require('../assets/arrow_back.png')}
+            style={styles.backIcon}
           />
         </TouchableOpacity>
 
-        <View
-          style={{
-            flexDirection: "column",
-            alignContent: "center",
-            minWidth: "60%",
-          }}
-        >
-          <Text
-            style={{
-              fontWeight: "bold",
-              color: theme.colors.primary,
-              justifyContent: "center",
-              fontSize: 22,
-            }}
-          >
-            Results
-          </Text>
+        <View style={styles.titleContainer}>
+          <Text style={styles.title}>Results</Text>
         </View>
 
-        <View
-          style={{
-            flexDirection: "column",
-            alignContent: "center",
-            minWidth: "10%",
-          }}
-        ></View>
+        <View style={styles.emptySpace}></View>
       </View>
 
       <View style={styles.container}>
-        <View style={{ justifyContent: "center", paddingTop: 10 }}>
-          <View style={{ flexDirection: "row" }}>
-            <View style={{ flexDirection: "column", width: "10%" }}>
-              <Text style={{ fontWeight: "800" }}>#</Text>
-            </View>
-            <View style={{ flexDirection: "column", width: "30%" }}>
-              <Text style={{ fontWeight: "800" }}>Student Code</Text>
-            </View>
-            <View style={{ flexDirection: "column", width: "50%" }}>
-              <Text style={{ fontWeight: "800" }}>Name</Text>
-            </View>
-            <View style={{ flexDirection: "column", width: "10%" }}>
-              <Text style={{ fontWeight: "800" }}>Point</Text>
-            </View>
-          </View>
+        <View style={styles.tableHeader}>
+          <Text style={styles.headerText1}>#</Text>
+          <Text style={styles.headerText2}>StudentCode</Text>
+          <Text style={styles.headerText3}>Name</Text>
+          <Text style={styles.headerText4}>Point</Text>
         </View>
         <FlatList
           data={results}
@@ -110,52 +71,114 @@ const Result = ({ route, navigation }) => {
           nestedScrollEnabled
           scrollEnabled
           showsVerticalScrollIndicator
-          renderItem={({ item, index }) => {
-            return (
-              <>
-                <View
-                  style={{
-                    justifyContent: "center",
-                    borderBottomColor: theme.colors.label,
-                    borderBottomWidth: 0.5,
-                    paddingVertical: 10,
-                  }}
-                >
-                  <View style={{ flexDirection: "row" }}>
-                    <View style={{ flexDirection: "column", width: "10%" }}>
-                      <Text>{index + 1}</Text>
-                    </View>
-                    <View style={{ flexDirection: "column", width: "30%" }}>
-                      <Text>{item.students.student_code}</Text>
-                    </View>
-                    <View style={{ flexDirection: "column", width: "50%" }}>
-                      <Text>{item.students.full_name}</Text>
-                    </View>
-                    <View
-                      style={{
-                        flexDirection: "column",
-                        // width: "10%",
-                        // paddingLeft: "5%",
-                      }}
-                    >
-                      <Text>{item.point}</Text>
-                    </View>
-                  </View>
-                </View>
-              </>
-            );
-          }}
+          renderItem={({ item, index }) => (
+            <TouchableOpacity
+              onPress={() =>
+                navigateToDetail(
+                  item.students.student_code,
+                  item.students.full_name,
+                  item.point
+                )
+              }
+            >
+              <View style={styles.tableRow}>
+                <Text style={styles.rowText1}>{index + 1}</Text>
+                <Text style={styles.rowText2}>{item.students.student_code}</Text>
+                <Text style={styles.rowText3}>{item.students.full_name}</Text>
+                <Text style={styles.rowText4}>{item.point}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
         />
       </View>
     </SafeAreaView>
   );
 };
-export default Result;
+
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    alignContent: 'center',
+    paddingLeft: 20,
+    paddingTop: 30,
+    minWidth: '100%',
+    backgroundColor: '#ffffff',
+  },
+  backButton: {
+    flexDirection: 'column',
+    alignContent: 'center',
+    minWidth: '30%',
+  },
+  backIcon: {
+    width: 24,
+    height: 24,
+  },
+  titleContainer: {
+    flexDirection: 'column',
+    alignContent: 'center',
+    minWidth: '60%',
+  },
+  title: {
+    fontWeight: 'bold',
+    color: '#92050B',
+    justifyContent: 'center',
+    fontSize: 22,
+  },
+  emptySpace: {
+    flexDirection: 'column',
+    alignContent: 'center',
+    minWidth: '10%',
+  },
   container: {
     flex: 1,
     paddingHorizontal: 20,
-    backgroundColor: "#ffffff",
+    backgroundColor: '#ffffff',
     marginTop: 20,
   },
+  tableHeader: {
+    justifyContent: 'center',
+    flexDirection: 'row',
+  },
+  headerText1: {
+    fontWeight: '800',
+    width: '10%',
+  },
+  headerText2: {
+    fontWeight: '800',
+    width: '30%',
+  },
+  headerText3: {
+    fontWeight: '800',
+    width: '45%',
+  },
+  headerText4: {
+    fontWeight: '800',
+    width: '15%',
+    textAlign : "center"
+  },
+  tableRow: {
+    justifyContent: 'center',
+    borderBottomColor: '#2196F3',
+    borderBottomWidth: 0.5,
+    paddingVertical: 10,
+    flexDirection: 'row',
+  },
+  rowText1: {
+    width: '10%',
+  },
+
+  rowText2: {
+    width: '30%',
+  },
+
+  rowText3: {
+    width: '45%',
+  },
+
+  rowText4: {
+    width: '15%',
+    textAlign : "center"
+  },
 });
+
+export default Result;
