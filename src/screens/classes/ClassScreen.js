@@ -260,6 +260,11 @@ const styles = StyleSheet.create({
     flex: 1,
     flexWrap: "wrap",
     paddingRight: 90,
+    color: theme.colors.text,
+    fontWeight: "bold",
+    letterSpacing: 1,
+    paddingTop: 5,
+    textTransform: "uppercase",
     // colors: "#000000",
   },
   row: {

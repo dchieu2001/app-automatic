@@ -36,12 +36,13 @@ const AnswerStudent = ({ route, navigation }) => {
   // const [studentId, setStudentId] = useState({ value: "", error: "" });
   const [disabled, setDisabled] = useState(false);
   const [answerKey, setAnswerKey] = useState([]);
-  let arr = new Map();
   const [imageFromGellary, setImageFromGellary] = useState(null);
   const [imageFromCamera, setImageFromCamera] = useState(null);
   const [isScaningImage, setIsScaningImage] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [answered1, setAnswered1] = useState([]);
+  const [arrr, setarr]= useState();
+
   const answered = [];
 
   const loadAnswerd = async () => {
@@ -69,13 +70,8 @@ const AnswerStudent = ({ route, navigation }) => {
     );
     setAnswered1(answered);
   };
-  // remember url after change domain
-  // const URLpath =
-  //   "https://84de-2401-d800-9d51-f301-7185-811a-1244-bb2a.ap.ngrok.io/file/upload-answer-student/";
-  // const URLpath =
-  //   "http://127.0.0.1:8000/file/upload-answer-key/";
-  const serverIp = '192.168.1.10'; // Thay YOUR_SERVER_IP bằng địa chỉ IPv4 của máy tính của bạn
-  const serverUrl = `/file/upload-answer-student/`;
+  const serverIp = '192.168.1.216'; 
+  const serverUrl = `http://${serverIp}:8000/file/upload-answer-student/`;
 
   const { control, handleSubmit, formState: { errors }, reset, getValues } = useForm({
     defaultValues: {
@@ -93,18 +89,37 @@ const AnswerStudent = ({ route, navigation }) => {
     control,
     name: "answer",
   })
+//
+
+
+    const fetchData = async () => {
+      try {
+        const { data: answers } = await supabase
+          .from("answer_exams")
+          .select("answers")
+          .eq("exam_id", examId);
+        //   console.log("examID", examId);
+        // console.log('answers', answers[0].answers);
+        setarr(answers[0].answers);
+      } catch (error) {
+        // console.error('Error fetching data:', error);
+      }
+    };
+    useEffect(() => {
+      fetchData();
+    }, []);
+        // console.log("arrr", arrr)
 
 
 
-
-
+    
   const getAnswerKeyOfStudent = async () => {
     setIsLoading(true);
     let { data: answers, error } = await supabase
       .from("answer_students")
       .select(`answers`)
       .eq("student_id", studentId)
-    console.log('answer', answers);
+    // console.log('answer', answers);
     
     if (Array.isArray(answers) && answers?.[0]) {
       reset({
@@ -157,92 +172,112 @@ const AnswerStudent = ({ route, navigation }) => {
 
   const Save = async (data) => {
     console.log("click save");
+    // console.log("data",data);
     let check = false;
     let ans = [];
     let count = 0;
     var urlImage = "";
-    arr.forEach(function (value, key) {
-      ans.push({ key, value });
+    data.answer.forEach(function (item) {
+        ans.push(item);
     });
+    // console.log("ans",ans);
 
     if (!data) {
-      return;
+        return;
     }
-
-
+    
     // check answer is correct!
-    // arr.forEach(function (value, key) {
-    //   ans.push({ key, value });
-    //   if (value === answerKey[key]) {
-    //     count++;
-    //   }
-    // });
+    // arrr.forEach(function (value, key) {
+    //     ans.push({ key, value });
+    //     if (value === answerKey[key]) {
+    //         count++;
+    //     }
+    // })
+    arrr.forEach((item1) => {
+      ans.forEach((item2) => {
+        // So sánh key và value của các phần tử
+        if (item1.key === item2.key && item1.value === item2.value) {
+          // Nếu giống nhau, tăng đếm
+          count++;
+        }
+      });
+    });
+    
+    // console.log("count",count)
+
+    // console.log("Count:", count); // Log count
 
     let { data: students, error } = await supabase
-      .from("answer_students")
-      .select("*")
-      .eq("exam_id", examId)
-      .eq("student_id", studentId);
-    console.log('studentas', students);
-    // students.filter(e=> {
-    //   if()
-    // })
-    // console.log(students);
-    // check student_code
-    if (students[0]) {
-      const { error1 } = await supabase
         .from("answer_students")
-        .update([
-          {
-            exam_id: examId,
-            answers: data.answer.sort(),
-            point: (count * scale).toFixed(1),
-          },
-        ])
+        .select("*")
+        .eq("exam_id", examId)
         .eq("student_id", studentId);
+    // console.log('Students:', students);
 
-      if (error1) {
-        Alert.alert("Failed!", "Update answer of student failed!", [
-          {
-            text: "OK",
-            onPress: () => {},
-          },
-        ]);
-      } else {
-        Alert.alert("Success!", "Update answer of student successful!", [
-          {
-            text: "OK",
-            onPress: () => {},
-          },
-        ]);
-      }
+
+    // ...
+
+    if (students.length > 0) {
+        const { data: updatedata, error: error1 } = await supabase
+            .from("answer_students")
+            .update([
+                {
+                    exam_id: examId,
+                    answers: data.answer.sort(),
+                    point: (count * scale)
+                },
+            ])
+            .eq("student_id", studentId);
+              // console.log("data", updatedata)
+        // console.log("Updated Data:", data); // Log updated data
+        // console.log("ERRRR:", error1); // Log updated data
+
+
+        if (error1) {
+            Alert.alert("Failed!", "Update answer of student failed!", [
+                {
+                    text: "OK",
+                    onPress: () => {},
+                },
+            ]);
+        } else {
+            Alert.alert("Success!", "Update answer of student successful!", [
+                {
+                    text: "OK",
+                    onPress: () => {},
+                },
+            ]);
+        }
     } else {
-      const { error1 } = await supabase.from("answer_students").insert([
-        {
-          exam_id: examId,
-          student_id: studentId,
-          answers: data.answer.sort(),
-          point: (count * scale).toFixed(1),
-        },
-      ]);
+        const { data, error: error1 } = await supabase.from("answer_students").insert([
+            {
+                exam_id: examId,
+                student_id: studentId,
+                answers: data.answer.sort(),
+                point: (count * scale)
+            },
+        ]);
 
-      if (error1) {
-        Alert.alert("Failed!", "Upload answer of student failed!", [
-          {
-            text: "OK",
-            onPress: () => {},
-          },
-        ]);
-      } else {
-        Alert.alert("Success!", "Upload answer of student successful!", [
-          {
-            text: "OK",
-            onPress: () => {},
-          },
-        ]);
-      }
+        // console.log("Inserted Data:", insertedData); // Log inserted data
+
+        if (error1) {
+            Alert.alert("Failed!", "Upload answer of student failed!", [
+                {
+                    text: "OK",
+                    onPress: () => {},
+                },
+            ]);
+        } else {
+            Alert.alert("Success!", "Upload answer of student successful!", [
+                {
+                    text: "OK",
+                    onPress: () => {},
+                },
+            ]);
+        }
     }
-  };
+};
+
 
   const scanImage = async (imageData) => {
     if (imageData === null) {
@@ -266,7 +301,7 @@ const AnswerStudent = ({ route, navigation }) => {
             'Content-Type': 'multipart/form-data',
           },
         });
-        console.log('Dữ liệu từ API:', response.data);
+        // console.log('Dữ liệu từ API:', response.data);
         reset({
           answer: response.data
         });

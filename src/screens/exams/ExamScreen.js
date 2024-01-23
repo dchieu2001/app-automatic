@@ -32,10 +32,16 @@ const ExamScreen = ({ navigation }) => {
     exams ? setExam(exams.filter((e) => e.classes !== null)) : setExam(null);
   };
 
+  // useEffect(() => {
+  //   setLoading(false);
+  //   loadExams();
+  // }, []);
   useEffect(() => {
-    setLoading(false);
-    loadExams();
-  }, []);
+    setTimeout(async () => {
+      exam ? setLoading(false) : setLoading(true);
+      loadExams();
+    }, 1000);
+  }, [currentUser, loadExams]);
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ minHeight: "90%" }}>

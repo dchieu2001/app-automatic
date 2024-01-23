@@ -39,7 +39,7 @@ const AnswerKey = ({ route, navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
   // const URLpath =
   //   "http://127.0.0.1:8000/file/upload-answer-key/";
-    const serverIp = '192.168.1.246'; // Thay YOUR_SERVER_IP bằng địa chỉ IPv4 của máy tính của bạn
+    const serverIp = '192.168.1.216'; // Thay YOUR_SERVER_IP bằng địa chỉ IPv4 của máy tính của bạn
     const serverUrl = `http://${serverIp}:8000/file/upload-answer-key/`;
   const [answered1, setAnswered1] = useState([]);
   const answered = [];

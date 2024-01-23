@@ -94,7 +94,7 @@ const ListStudentByClass = ({ route, navigation }) => {
               fontSize: 22,
             }}
           >
-            Student(s)
+            Student
           </Text>
         </View>
       </View>
@@ -203,22 +203,66 @@ const ListStudentByClass = ({ route, navigation }) => {
 
 export default ListStudentByClass;
 
+// const styles = StyleSheet.create({
+//   container: {
+//     position: "relative",
+//     background: "#F7F7F7",
+//   },
+//   row_title: {
+//     flexDirection: "column",
+//     justifyContent: "center",
+//     alignItems: "center",
+//     fontSize: 24,
+//     paddingTop: 10,
+//   },
+//   row: {
+//     flexDirection: "row",
+//     justifyContent: "flex-start",
+//     alignContent: "center",
+//     borderColor: "#753E33",
+//     borderBottomWidth: 0.8,
+//     marginBottom: 10,
+//     backgroundColor: "#ffffff",
+//     shadowColor: "#7F5DF0",
+//     shadowOffset: {
+//       width: 0,
+//       height: 10,
+//     },
+//     shadowOpacity: 0.25,
+//     shadowRadius: 3.5,
+//     height: "auto",
+//     borderRadius: 10,
+//     width: "100%",
+//     marginTop: 3,
+//   },
+//   btn_new: {
+//     backgroundColor: theme.colors.primary,
+//     borderRadius: 100,
+//     display: "flex",
+//     width: 50,
+//     height: 50,
+//     bottom: 10,
+//     right: 20,
+//     justifyContent: "center",
+//     alignContent: "center",
+//     position: "absolute",
+
+//     shadowColor: "#000",
+//     shadowOffset: {
+//       width: 0,
+//       height: 7,
+//     },
+//     shadowOpacity: 0.41,
+//     shadowRadius: 9.11,
+
+//     elevation: 14,
+//   },
+// });
 const styles = StyleSheet.create({
-  container: {
-    position: "relative",
-    background: "#F7F7F7",
-  },
-  row_title: {
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
-    fontSize: 24,
-    paddingTop: 10,
-  },
-  row: {
+  studentContainer: {
     flexDirection: "row",
-    justifyContent: "flex-start",
-    alignContent: "center",
+    justifyContent: "space-between",
+    alignItems: "center",
     borderColor: "#753E33",
     borderBottomWidth: 0.8,
     marginBottom: 10,
@@ -230,31 +274,33 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.5,
-    height: "auto",
     borderRadius: 10,
     width: "100%",
     marginTop: 3,
+    padding: 10,
   },
-  btn_new: {
-    backgroundColor: theme.colors.primary,
-    borderRadius: 100,
-    display: "flex",
+  avatarContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  avatar: {
     width: 50,
     height: 50,
-    bottom: 10,
-    right: 20,
-    justifyContent: "center",
-    alignContent: "center",
-    position: "absolute",
-
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 7,
-    },
-    shadowOpacity: 0.41,
-    shadowRadius: 9.11,
-
-    elevation: 14,
+    borderRadius: 25,
+  },
+  detailsContainer: {
+    flexDirection: "row",
+    width: "75%",
+    marginLeft: 10,
+    alignItems: "center",
+  },
+  fullName: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333", // Thay đổi màu sắc nếu cần
+  },
+  arrowIcon: {
+    width: 16,
+    height: 16,
   },
 });

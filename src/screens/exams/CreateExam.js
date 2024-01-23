@@ -134,8 +134,8 @@ const CreateExam = ({ navigation }) => {
   ];
 
   const scale = [
-    { value: 1, label: "0.4" },
-    { value: 2, label: "0.2" },
+    { value: 1, label: "1" },
+    { value: 2, label: "0.5" },
   ];
 
   const Done = async () => {

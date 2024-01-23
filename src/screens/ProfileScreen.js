@@ -460,8 +460,7 @@ const ProfileScreen = ({ navigation }) => {
           </View>
           {/* version and information teamdev */}
           <View style={styles.footer}>
-            <Text>Version 1.0.1</Text>
-            <Text>Team Developer: Group 9_IG5</Text>
+            
           </View>
         </View>
       </View>

@@ -160,7 +160,7 @@ const CreateStudent = ({ route, navigation }) => {
           {/* input name class code */}
           <View style={styles.box}>
             <TextInput
-              keyboardType="text"
+              keyboardType="default"
               label="Student Code"
               returnKeyType="next"
               value={studentCode.value}
@@ -174,7 +174,7 @@ const CreateStudent = ({ route, navigation }) => {
           {/* input name class  */}
           <View style={styles.box}>
             <TextInput
-              keyboardType="text"
+              keyboardType="default"
               label="Student Name"
               returnKeyType="done"
               value={name.value}
