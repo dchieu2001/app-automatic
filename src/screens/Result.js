@@ -15,6 +15,8 @@ import { supabase } from '../utils/supabase-service';
 const Result = ({ route }) => {
   const navigation = useNavigation();
   const class_id = route.params.id;
+  const examId = route.params.examId;
+  console.log(examId)
   const [results, setResults] = useState([]);
 
   const loadResults = async () => {
@@ -30,11 +32,13 @@ const Result = ({ route }) => {
     loadResults();
   }, []);
 
-  const navigateToDetail = (studentCode, fullName, point) => {
+  const navigateToDetail = (studentCode, fullName, point,examId,studentid) => {
     navigation.navigate('DetailAnswerStudents', {
       studentCode,
       fullName,
       point,
+      examId,
+      studentid
     });
   };
 
@@ -77,7 +81,9 @@ const Result = ({ route }) => {
                 navigateToDetail(
                   item.students.student_code,
                   item.students.full_name,
-                  item.point
+                  item.point,
+                  examId,
+                  item.student_id
                 )
               }
             >

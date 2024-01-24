@@ -25,3 +25,4 @@ export { default as AnswerStudent } from "./AnswerStudent";
 export { default as AnswerKey } from "./AnswerKey";
 export { default as AnalystExam } from "./AnalystExam";
 export { default as Result } from "./Result";
+export { default as DetailAnswerStudents } from "./DetailAnswerStudents";

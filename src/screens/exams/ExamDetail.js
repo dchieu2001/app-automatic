@@ -437,7 +437,7 @@ const ExamDetail = ({ route, navigation }) => {
               disabled={disable}
               style={styles.btn}
               onPress={() =>
-                navigation.navigate("Result", { id: exam[0].class_id })
+                navigation.navigate("Result", { id: exam[0].class_id, examId: examId,  })
               }
             >
               <View style={{ flexDirection: "column" }}>
