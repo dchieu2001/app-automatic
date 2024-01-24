@@ -194,7 +194,7 @@ const CreateExamByClass = ({ route, navigation }) => {
           {/* enter name exam */}
           <View style={styles.box}>
             <TextInput
-              keyboardType="text"
+              keyboardType="default"
               label="Name Exam *"
               returnKeyType="next"
               value={name.value}
@@ -243,7 +243,7 @@ const CreateExamByClass = ({ route, navigation }) => {
                 }
                 error={!!choiceQuestion.error}
                 errorText={choiceQuestion.error}
-                keyboardType="text"
+                keyboardType="default"
               ></TextInput> */}
               {choiceQuestion.error ? (
                 <Text style={styles.error}>{choiceQuestion.error}</Text>
@@ -262,7 +262,7 @@ const CreateExamByClass = ({ route, navigation }) => {
                 }
                 error={!!scaleQuestion.error}
                 errorText={scaleQuestion.error}
-                keyboardType="text"
+                keyboardType="default"
               ></TextInput> */}
               <Dropdown
                 ref={ref}
@@ -354,7 +354,7 @@ const CreateExamByClass = ({ route, navigation }) => {
               onChangeText={(text) =>
                 setDescription({ value: text, error: "" })
               }
-              keyboardType="text"
+              keyboardType="default"
             ></TextInput>
           </View>
           {/* button handle */}

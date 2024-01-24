@@ -516,7 +516,7 @@ const ClassDetail = ({ route, navigation }) => {
                   {/* input name class code */}
                   <View style={styles.box}>
                     <TextInput
-                      keyboardType="text"
+                      keyboardType="default"
                       label="Class Code"
                       returnKeyType="next"
                       value={classCode.value}
@@ -530,7 +530,7 @@ const ClassDetail = ({ route, navigation }) => {
                   {/* input name class  */}
                   <View style={styles.box}>
                     <TextInput
-                      keyboardType="text"
+                      keyboardType="default"
                       label="Name Class"
                       returnKeyType="next"
                       value={name.value}
@@ -617,7 +617,7 @@ const ClassDetail = ({ route, navigation }) => {
                       }
                       //   error={!!description.error}
                       //   errorText={description.error}
-                      keyboardType="text"
+                      keyboardType="default"
                     ></TextInput>
                   </View>
                 </View>

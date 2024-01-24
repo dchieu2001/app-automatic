@@ -359,7 +359,7 @@ const StudentDetail = ({ route, navigation }) => {
                         <View style={styles.box}>
                           <TextInput
                             required
-                            keyboardType="text"
+                            keyboardType="default"
                             label="Student Code"
                             returnKeyType="next"
                             value={studentCodeEdit.value}
@@ -373,7 +373,7 @@ const StudentDetail = ({ route, navigation }) => {
                         {/* input name class  */}
                         <View style={styles.box}>
                           <TextInput
-                            keyboardType="text"
+                            keyboardType="default"
                             label="Student Name"
                             returnKeyType="done"
                             value={nameEdit.value}
