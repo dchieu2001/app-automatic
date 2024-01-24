@@ -39,8 +39,7 @@ const AnswerKey = ({ route, navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
   // const URLpath =
   //   "http://127.0.0.1:8000/file/upload-answer-key/";
-    const serverIp = '192.168.1.216'; 
-    const serverUrl = `http://${serverIp}:8000/file/upload-answer-key/`;
+    const apiUrl = "/file/upload-answer-key/";
   const [answered1, setAnswered1] = useState([]);
   const answered = [];
   let ans = [];
@@ -69,14 +68,12 @@ const AnswerKey = ({ route, navigation }) => {
       .from("answer_exams")
       .select("answers")
       .eq("exam_id", examId);
-      console.log('answers[0].answer', answers[0].answers);
-    if (answers) {
+    if (answers && answers?.[0]?.answers) {
       reset({
         answer: answers[0].answers
       })
-      setIsLoading(false);
     }
- 
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -259,7 +256,7 @@ const AnswerKey = ({ route, navigation }) => {
         type: type,
       });
       try {
-        const response = await axiosInstance.post(serverUrl, formData, {
+        const response = await axiosInstance.post(apiUrl, formData, {
           timeout: 10000,
           headers: {
             'Accept': 'application/json',
@@ -301,7 +298,7 @@ const AnswerKey = ({ route, navigation }) => {
           flexDirection: "row",
           alignContent: "center",
           paddingLeft: 20,
-          paddingTop: 100,
+          paddingTop: 30,
           minWidth: "100%",
           backgroundColor: theme.colors.background,
         }}
