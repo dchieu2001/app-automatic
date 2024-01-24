@@ -39,7 +39,7 @@ const AnswerKey = ({ route, navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
   // const URLpath =
   //   "http://127.0.0.1:8000/file/upload-answer-key/";
-    const serverIp = '192.168.1.246'; // Thay YOUR_SERVER_IP bằng địa chỉ IPv4 của máy tính của bạn
+    const serverIp = '192.168.1.216'; 
     const serverUrl = `http://${serverIp}:8000/file/upload-answer-key/`;
   const [answered1, setAnswered1] = useState([]);
   const answered = [];
@@ -63,32 +63,6 @@ const AnswerKey = ({ route, navigation }) => {
   })
 
 
-  // const loadAnswerd = async () => {
-  //   answered.push(
-  //     { index: 1, answer: "A" },
-  //     { index: 2, answer: "B" },
-  //     { index: 3, answer: "C" },
-  //     { index: 4, answer: "D" },
-  //     { index: 5, answer: "A" },
-  //     { index: 6, answer: "A" },
-  //     { index: 7, answer: "B" },
-  //     { index: 8, answer: "C" },
-  //     { index: 9, answer: "D" },
-  //     { index: 10, answer: "A" },
-  //     { index: 11, answer: "A" },
-  //     { index: 12, answer: "B" },
-  //     { index: 13, answer: "C" },
-  //     { index: 14, answer: "D" },
-  //     { index: 15, answer: "A" },
-  //     { index: 16, answer: "A" },
-  //     { index: 17, answer: "B" },
-  //     { index: 18, answer: "C" },
-  //     { index: 19, answer: "D" },
-  //     { index: 20, answer: "A" }
-  //   );
-  //   setAnswered1(answered);
-  // };
-
   const getAnswered = async () => {
     setIsLoading(true);
     const { data: answers } = await supabase
@@ -102,12 +76,7 @@ const AnswerKey = ({ route, navigation }) => {
       })
       setIsLoading(false);
     }
-    // answers.forEach(function (value, key) {
-    //   ans.push({ key, value });
-    // });
-    // ans.map((e) => {
-    //   console.log(e.value);
-    // });
+ 
   };
 
   useEffect(() => {
