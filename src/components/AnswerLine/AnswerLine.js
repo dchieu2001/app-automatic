@@ -106,19 +106,19 @@ export default function AnswerLine(props) {
             <>
               <View style={styles.answerItem}>
                 <Text>A.</Text>
-                <RadioButton value="A" color="#b9060f"/>
+                <RadioButton value="A" color="#0EF0F0"/>
               </View>
               <View style={styles.answerItem}>
                 <Text>B.</Text>
-                <RadioButton value="B" color="#b9060f"/>
+                <RadioButton value="B" color="#0EF0F0"/>
               </View>
               <View style={styles.answerItem}>
                 <Text>C.</Text>
-                <RadioButton value="C" color="#b9060f"/>
+                <RadioButton value="C" color="#0EF0F0"/>
               </View>
               <View style={styles.answerItem}>
                 <Text>D.</Text>
-                <RadioButton value="D" color="#b9060f"/>
+                <RadioButton value="D" color="#0EF0F0"/>
               </View>
             </>
           )}

@@ -25,7 +25,6 @@ function createArrayWithNumbers(length) {
 }
 
 const AnswerKey = ({ route, navigation }) => {
-  // let colection = ["A", "B", "C", "D "];
 
   let arr = new Map();
   const examId = route.params.id;
@@ -37,9 +36,7 @@ const AnswerKey = ({ route, navigation }) => {
   const [disabled, setDisabled] = useState(false);
   const [isScaningImage, setIsScaningImage] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  // const URLpath =
-  //   "http://127.0.0.1:8000/file/upload-answer-key/";
-    const apiUrl = "/file/upload-answer-key/";
+  const apiUrl = "/file/upload-answer-key/";
   const [answered1, setAnswered1] = useState([]);
   const answered = [];
   let ans = [];
@@ -166,35 +163,7 @@ const AnswerKey = ({ route, navigation }) => {
     //   setDisabled(true);
     //   urlImage = imageFromGellary;
     // }
-    // let match = /\.(\w+)$/.exec(urlImage);
-    // let type = match ? `image/${match[1]}` : `image`;
-    // if (check) {
-    //   const formData = new FormData();
-    //   formData.append("file", {
-    //     uri: urlImage,
-    //     name: urlImage.split("/").pop(),
-    //     type: type,
-    //   });
-    //   try {
-    //     const response = await axiosInstance.post(serverUrl, formData, {
-    //       headers: {
-    //         'Accept': 'application/json',
-    //         'Content-Type': 'multipart/form-data',
-    //       },
-    //     });
-    //     console.log('Dữ liệu từ API:', response.data);
-    //     setAnswerData(response.data)
-    //   } catch (error) {
-    //     console.error('Lỗi trong yêu cầu axios:', error);
-    //   }
-    // }
 
-
-
-    
-    // answered.map((e) => {
-    //   console.log(e.index + " , " + e.answer);
-    // });
 
     if (!data) {
       return;
@@ -335,7 +304,7 @@ const AnswerKey = ({ route, navigation }) => {
               fontSize: 22,
             }}
           >
-            {examName}
+            AnswerExam
           </Text>
         </View>
 
