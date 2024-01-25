@@ -70,8 +70,7 @@ const AnswerStudent = ({ route, navigation }) => {
     );
     setAnswered1(answered);
   };
-  const serverIp = '192.168.1.216'; 
-  const serverUrl = `http://${serverIp}:8000/file/upload-answer-student/`;
+  const apiURL ="/file/upload-answer-student/";
 
   const { control, handleSubmit, formState: { errors }, reset, getValues } = useForm({
     defaultValues: {
@@ -125,9 +124,8 @@ const AnswerStudent = ({ route, navigation }) => {
       reset({
         answer: answers[0].answers
       })
-      setIsLoading(false);
     }
-    // setAnswerKey(answer_exams[0].answers);
+      setIsLoading(false);
   };
 
   useEffect(() => {
@@ -295,7 +293,7 @@ const AnswerStudent = ({ route, navigation }) => {
         type: type,
       });
       try {
-        const response = await axiosInstance.post(serverUrl, formData, {
+        const response = await axiosInstance.post(apiURL, formData, {
           headers: {
             'Accept': 'application/json',
             'Content-Type': 'multipart/form-data',
