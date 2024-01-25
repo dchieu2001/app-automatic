@@ -34,8 +34,6 @@ const ListStudentByClass = ({ route, navigation }) => {
       .eq("classes.is_delete", false)
       .order("full_name", { ascending: true });
 
-    console.log('student2', student);
-
     if (student.length === 0) {
       setStudents(null);
     } else {

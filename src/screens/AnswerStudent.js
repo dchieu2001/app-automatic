@@ -33,43 +33,12 @@ const AnswerStudent = ({ route, navigation }) => {
   const classId = route.params.class_id;
   const studentId = route.params.studentId;
   const currentUser = supabase.auth.user();
-  // const [studentId, setStudentId] = useState({ value: "", error: "" });
-  const [disabled, setDisabled] = useState(false);
-  const [answerKey, setAnswerKey] = useState([]);
   const [imageFromGellary, setImageFromGellary] = useState(null);
   const [imageFromCamera, setImageFromCamera] = useState(null);
   const [isScaningImage, setIsScaningImage] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [answered1, setAnswered1] = useState([]);
-  const [arrr, setarr]= useState();
+  const [answerKey, setAnswerKey]= useState(null);
 
-  const answered = [];
-
-  const loadAnswerd = async () => {
-    answered.push(
-      { index: 1, answer: "A" },
-      { index: 2, answer: "B" },
-      { index: 3, answer: "C" },
-      { index: 4, answer: "D" },
-      { index: 5, answer: "A" },
-      { index: 6, answer: "A" },
-      { index: 7, answer: "B" },
-      { index: 8, answer: "C" },
-      { index: 9, answer: "D" },
-      { index: 10, answer: "A" },
-      { index: 11, answer: "A" },
-      { index: 12, answer: "B" },
-      { index: 13, answer: "C" },
-      { index: 14, answer: "D" },
-      { index: 15, answer: "A" },
-      { index: 16, answer: "A" },
-      { index: 17, answer: "B" },
-      { index: 18, answer: "C" },
-      { index: 19, answer: "D" },
-      { index: 20, answer: "A" }
-    );
-    setAnswered1(answered);
-  };
   const apiURL ="/file/upload-answer-student/";
 
   const { control, handleSubmit, formState: { errors }, reset, getValues } = useForm({
@@ -88,29 +57,20 @@ const AnswerStudent = ({ route, navigation }) => {
     control,
     name: "answer",
   })
-//
 
-
-    const fetchData = async () => {
-      try {
-        const { data: answers } = await supabase
-          .from("answer_exams")
-          .select("answers")
-          .eq("exam_id", examId);
-        //   console.log("examID", examId);
-        // console.log('answers', answers[0].answers);
-        setarr(answers[0].answers);
-      } catch (error) {
-        // console.error('Error fetching data:', error);
+  const fetchAnswerKey = async () => {
+    try {
+      const { data: answers } = await supabase
+        .from("answer_exams")
+        .select("answers")
+        .eq("exam_id", examId);
+      if (answers) {
+        setAnswerKey(answers[0].answers);
       }
-    };
-    useEffect(() => {
-      fetchData();
-    }, []);
-        // console.log("arrr", arrr)
-
-
-
+    } catch (error) {
+      // console.error('Error fetching data:', error);
+    }
+  };
     
   const getAnswerKeyOfStudent = async () => {
     setIsLoading(true);
@@ -118,6 +78,7 @@ const AnswerStudent = ({ route, navigation }) => {
       .from("answer_students")
       .select(`answers`)
       .eq("student_id", studentId)
+      .eq("exam_id", examId);
     // console.log('answer', answers);
     
     if (Array.isArray(answers) && answers?.[0]) {
@@ -130,6 +91,7 @@ const AnswerStudent = ({ route, navigation }) => {
 
   useEffect(() => {
     getAnswerKeyOfStudent();
+    fetchAnswerKey();
   }, []);
   // select image from gallery
   const pickImage = async () => {
@@ -168,19 +130,10 @@ const AnswerStudent = ({ route, navigation }) => {
     }
   };
 
-  const Save = async (data) => {
+  const Save = async (formData) => {
     console.log("click save");
-    // console.log("data",data);
-    let check = false;
-    let ans = [];
-    let count = 0;
     var urlImage = "";
-    data.answer.forEach(function (item) {
-        ans.push(item);
-    });
-    // console.log("ans",ans);
-
-    if (!data) {
+    if (!formData) {
         return;
     }
     
@@ -191,29 +144,26 @@ const AnswerStudent = ({ route, navigation }) => {
     //         count++;
     //     }
     // })
-    arrr.forEach((item1) => {
-      ans.forEach((item2) => {
-        // So sánh key và value của các phần tử
-        if (item1.key === item2.key && item1.value === item2.value) {
-          // Nếu giống nhau, tăng đếm
-          count++;
-        }
-      });
-    });
-    
-    // console.log("count",count)
-
-    // console.log("Count:", count); // Log count
 
     let { data: students, error } = await supabase
         .from("answer_students")
         .select("*")
         .eq("exam_id", examId)
         .eq("student_id", studentId);
-    // console.log('Students:', students);
 
+    let countCorrectAnswer = 0;
+    if (answerKey && formData?.answer) {
+      answerKey.forEach((item1) => {
+        formData?.answer?.forEach((item2) => {
+          // So sánh key và value của các phần tử
+          if (item1.key === item2.key && item1.value === item2.value) {
+            // Nếu giống nhau, tăng đếm
+            countCorrectAnswer++;
+          }
+        });
+      });
+    }
 
-    // ...
 
     if (students.length > 0) {
         const { data: updatedata, error: error1 } = await supabase
@@ -221,8 +171,8 @@ const AnswerStudent = ({ route, navigation }) => {
             .update([
                 {
                     exam_id: examId,
-                    answers: data.answer.sort(),
-                    point: (count * scale)
+                    answers: formData.answer.sort(),
+                    point: (countCorrectAnswer * scale)
                 },
             ])
             .eq("student_id", studentId);
@@ -251,8 +201,8 @@ const AnswerStudent = ({ route, navigation }) => {
             {
                 exam_id: examId,
                 student_id: studentId,
-                answers: data.answer.sort(),
-                point: (count * scale)
+                answers: formData.answer.sort(),
+                point: (countCorrectAnswer * scale)
             },
         ]);
 
@@ -334,7 +284,7 @@ const AnswerStudent = ({ route, navigation }) => {
           flexDirection: "row",
           alignContent: "center",
           paddingLeft: 20,
-          paddingTop: 30,
+          paddingTop: 130,
           minWidth: "100%",
           backgroundColor: theme.colors.background,
         }}

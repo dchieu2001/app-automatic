@@ -34,7 +34,6 @@ const CreateExam = ({ navigation }) => {
 
   const [SemesterError, setSemesterError] = useState("");
   const [Semester, setSemester] = useState("");
-  const [classID, setClassID] = useState("");
 
   const [choiceQuestion, setChoiceQuestion] = useState({
     value: "",
@@ -196,45 +195,45 @@ const CreateExam = ({ navigation }) => {
           c.class_code === ClassCode
       );
       const idClass = Class[0].id;
-      setClassID(idClass);
-    }
 
-    const { error } = await supabase.from("exams").insert([
-      {
-        name: name.value,
-        option: question,
-        scale: scal,
-        date_exam: date.value,
-        is_delete: false,
-        description: description.value,
-        class_id: classID,
-      },
-    ]);
-    if (error) {
-      Alert.alert("Failed!", "Create exam " + name.value + " failed.", [
+      const { error } = await supabase.from("exams").insert([
         {
-          text: "Back",
-          onPress: () => {
-            setLoading(false);
-          },
+          name: name.value,
+          option: question,
+          scale: scal,
+          date_exam: date.value,
+          is_delete: false,
+          description: description.value,
+          class_id: idClass,
         },
       ]);
-    } else {
-      Alert.alert("Success!", "Create exam " + name.value + " successful!", [
-        {
-          text: "Back exam list",
-          onPress: () => {
-            setLoading(false);
-            navigation.goBack();
+
+      if (error) {
+        Alert.alert("Failed!", "Create exam " + name.value + " failed.", [
+          {
+            text: "Back",
+            onPress: () => {
+              setLoading(false);
+            },
           },
-        },
-        {
-          text: "OK",
-          onPress: () => {
-            setLoading(false);
+        ]);
+      } else {
+        Alert.alert("Success!", "Create exam " + name.value + " successful!", [
+          {
+            text: "Back exam list",
+            onPress: () => {
+              setLoading(false);
+              navigation.goBack();
+            },
           },
-        },
-      ]);
+          {
+            text: "OK",
+            onPress: () => {
+              setLoading(false);
+            },
+          },
+        ]);
+      }
     }
   };
 

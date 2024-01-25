@@ -41,7 +41,8 @@ const ExamScreen = ({ navigation }) => {
       exam ? setLoading(false) : setLoading(true);
       loadExams();
     }, 1000);
-  }, [currentUser, loadExams]);
+  }, [currentUser]);
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ minHeight: "90%" }}>
