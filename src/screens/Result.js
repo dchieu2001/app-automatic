@@ -24,7 +24,9 @@ const Result = ({ route }) => {
       .from('answer_students')
       .select('*, students(full_name, student_code)')
       .eq('students.is_delete', false)
-      .eq('students.class_id', class_id);
+      .eq('students.class_id', class_id)
+      .eq('exam_id', examId);
+      // console.log("student",result)
     setResults(result);
   };
 
