@@ -20,10 +20,7 @@ const ExamScreen = ({ navigation }) => {
   const loadExams = async () => {
     let { data: exams, error } = await supabase
       .from("exams")
-      .select(
-        `*,
-    classes (id, name, uid)`
-      )
+      .select(`*,classes (id, name, uid)`)
       .eq("is_delete", false)
       .eq("classes.is_delete", false)
       .eq("classes.uid", currentUser.id)
@@ -41,7 +38,7 @@ const ExamScreen = ({ navigation }) => {
       exam ? setLoading(false) : setLoading(true);
       loadExams();
     }, 1000);
-  }, [currentUser]);
+  }, [currentUser, loadExams]);
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
