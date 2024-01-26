@@ -284,7 +284,7 @@ const AnswerStudent = ({ route, navigation }) => {
           flexDirection: "row",
           alignContent: "center",
           paddingLeft: 20,
-          paddingTop: 130,
+          paddingTop: 30,
           minWidth: "100%",
           backgroundColor: theme.colors.background,
         }}
