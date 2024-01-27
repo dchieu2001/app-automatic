@@ -33,7 +33,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Allow InstaGrade to access your gallery."
+          "photosPermission": "Allow InstaGrade to access your gallery.",
+          "cameraPermission": "Allow InstaGrade to access your camera."
         }
       ]
     ]
