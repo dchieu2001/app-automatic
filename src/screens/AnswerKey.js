@@ -246,14 +246,12 @@ const AnswerKey = ({ route, navigation }) => {
 
   useEffect(() => {
     if (imageFromGellary) {
-      setImageFromCamera(null);
       scanImage(imageFromGellary);
     }
   }, [imageFromGellary]);
 
   useEffect(() => {
     if (imageFromCamera) {
-      setImageFromGellary(null);
       scanImage(imageFromCamera);
     }
   }, [imageFromCamera]);

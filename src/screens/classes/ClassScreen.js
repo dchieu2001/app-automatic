@@ -14,6 +14,7 @@ import { supabase } from "../../utils/supabase-service";
 import { theme } from "../../core/theme";
 import { TextInput } from "react-native-paper";
 import { themeColor } from "react-native-rapi-ui";
+import { useFocusEffect } from '@react-navigation/native';
 
 const ClassScreen = ({ navigation }) => {
   const [classList, setClassList] = useState([]);
@@ -21,23 +22,36 @@ const ClassScreen = ({ navigation }) => {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const loadClasses = async () => {
-    let { data: classes, error } = await supabase
-      .from("classes")
-      .select("*")
-      .eq("uid", currentUser.id)
-      .eq("is_delete", false)
-      // .order("class_code", { ascending: false })
-      .order("school_year", { ascending: false });
-    setClassList(classes);
-  };
-
-  useEffect(() => {
-    setTimeout(async () => {
-      classList ? setLoading(false) : setLoading(true);
+  useFocusEffect(
+    React.useCallback(() => {
+      let isActive = true;
+  
+      const loadClasses = async () => {
+        try {
+          setLoading(true)
+          let { data: classes, error } = await supabase
+            .from("classes")
+            .select("*")
+            .eq("uid", currentUser.id)
+            .eq("is_delete", false)
+            // .order("class_code", { ascending: false })
+            .order("school_year", { ascending: false });
+            if (classes) {
+              setClassList(classes);
+            }
+        } catch (error) {  
+        } finally {
+          setLoading(false);
+        }
+      };
+  
       loadClasses();
-    }, 1000);
-  }, [currentUser, loadClasses]);
+  
+      return () => {
+        isActive = false;
+      };
+    }, [currentUser])
+  );
 
   const filterClasses = () => {
     if (classList) {

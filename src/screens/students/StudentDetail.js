@@ -20,6 +20,7 @@ import { theme } from "../../core/theme";
 import { studentCodeValidator } from "../../helpers/studentCodeValidator";
 import { studentNameValidator } from "../../helpers/studentNameValidator";
 // import Modal from "react-native-modalbox";
+import { useFocusEffect } from '@react-navigation/native';
 
 const StudentDetail = ({ route, navigation }) => {
   // const refs = useRef();
@@ -40,30 +41,38 @@ const StudentDetail = ({ route, navigation }) => {
     ? styles.background
     : theme.colors.background;
 
-  const loadData = async () => {
-    let { data: student, error } = await supabase
-      .from("students")
-      .select(
-        `*, classes (
-        id, name, uid
-      )`
-      )
-      .eq("id", studentId)
-      .eq("classes.uid", currentUser.id)
-      .eq("is_delete", false)
-      .eq("classes.is_delete", false)
-      .order("full_name", { ascending: true });
-
-    if (student.length === 0) {
-      setStudents(null);
-    } else {
-      setStudents(student);
-    }
-  };
-
-  useEffect(() => {
-    loadData();
-  }, [currentUser, loadData]);
+  useFocusEffect(
+    React.useCallback(() => {
+      let isActive = true;
+  
+      const loadData = async () => {
+        let { data: student, error } = await supabase
+          .from("students")
+          .select(
+            `*, classes (
+            id, name, uid
+          )`
+          )
+          .eq("id", studentId)
+          .eq("classes.uid", currentUser.id)
+          .eq("is_delete", false)
+          .eq("classes.is_delete", false)
+          .order("full_name", { ascending: true });
+    
+        if (student.length === 0) {
+          setStudents(null);
+        } else {
+          setStudents(student);
+        }
+      };
+  
+      loadData();
+  
+      return () => {
+        isActive = false;
+      };
+    }, [currentUser])
+  );
 
   const edit = () => {
     console.log("click edit");

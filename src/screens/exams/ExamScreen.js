@@ -12,33 +12,40 @@ import React, { useEffect, useRef, useState } from "react";
 import Button from "../../components/Button";
 import { theme } from "../../core/theme";
 import { supabase } from "../../utils/supabase-service";
+import { useFocusEffect } from '@react-navigation/native';
 
 const ExamScreen = ({ navigation }) => {
   const [exam, setExam] = useState([]);
   const [loading, setLoading] = useState(false);
   const currentUser = supabase.auth.user();
-  const loadExams = async () => {
-    let { data: exams, error } = await supabase
-      .from("exams")
-      .select(`*,classes (id, name, uid)`)
-      .eq("is_delete", false)
-      .eq("classes.is_delete", false)
-      .eq("classes.uid", currentUser.id)
-      .order("date_exam", { ascending: false });
 
-    exams ? setExam(exams.filter((e) => e.classes !== null)) : setExam(null);
-  };
-
-  // useEffect(() => {
-  //   setLoading(false);
-  //   loadExams();
-  // }, []);
-  useEffect(() => {
-    setTimeout(async () => {
-      exam ? setLoading(false) : setLoading(true);
+  useFocusEffect(
+    React.useCallback(() => {
+      let isActive = true;
+  
+      const loadExams = async () => {
+        try {
+          let { data: exams, error } = await supabase
+            .from("exams")
+            .select(`*,classes (id, name, uid)`)
+            .eq("is_delete", false)
+            .eq("classes.is_delete", false)
+            .eq("classes.uid", currentUser.id)
+            .order("date_exam", { ascending: false });
+          if (exams) {
+            setExam(exams.filter((e) => e.classes !== null))
+          }
+        } catch (error) {
+        }
+      };
+  
       loadExams();
-    }, 1000);
-  }, [currentUser, loadExams]);
+  
+      return () => {
+        isActive = false;
+      };
+    }, [currentUser])
+  );
 
   return (
     <SafeAreaView style={{ flex: 1 }}>

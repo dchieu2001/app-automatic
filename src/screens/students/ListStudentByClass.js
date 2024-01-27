@@ -13,6 +13,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Button from "../../components/Button";
 import { supabase } from "../../utils/supabase-service";
 import { theme } from "../../core/theme";
+import { useFocusEffect } from '@react-navigation/native';
 
 const ListStudentByClass = ({ route, navigation }) => {
   const { classId, examId, examScale, examName, examOptions } = route.params;
@@ -20,33 +21,40 @@ const ListStudentByClass = ({ route, navigation }) => {
   const [students, setStudents] = useState([]);
 
   const [loading, setLoading] = useState(false);
-  const loadStudent = async () => {
-    let { data: student, error } = await supabase
-      .from("students")
-      .select(
-        `*, classes (
-        id,uid
-      )`
-      )
-      .eq("class_id", classId)
-      .eq("classes.uid", currentUser.id)
-      .eq("is_delete", false)
-      .eq("classes.is_delete", false)
-      .order("full_name", { ascending: true });
 
-    if (student.length === 0) {
-      setStudents(null);
-    } else {
-      setStudents(student);
-    }
-  };
+  useFocusEffect(
+    React.useCallback(() => {
+      let isActive = true;
+  
+      const loadStudent = async () => {
+        let { data: student, error } = await supabase
+          .from("students")
+          .select(
+            `*, classes (
+            id,uid
+          )`
+          )
+          .eq("class_id", classId)
+          .eq("classes.uid", currentUser.id)
+          .eq("is_delete", false)
+          .eq("classes.is_delete", false)
+          .order("full_name", { ascending: true });
+    
+        if (student.length === 0) {
+          setStudents(null);
+        } else {
+          setStudents(student);
+        }
+      };
+  
+      loadStudent();
+  
+      return () => {
+        isActive = false;
+      };
+    }, [currentUser])
+  );
 
-  useEffect(() => {
-    loadStudent();
-    setTimeout(async () => {
-      setLoading(false);
-    }, 1000);
-  }, []);
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View

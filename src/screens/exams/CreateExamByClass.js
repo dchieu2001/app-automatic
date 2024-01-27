@@ -42,10 +42,6 @@ const CreateExamByClass = ({ route, navigation }) => {
     ? styles.background
     : theme.colors.background;
 
-  useEffect(() => {
-    setLoading(false);
-  }, []);
-
   const showDatePicker = () => {
     setDatePickerVisibility(true);
   };

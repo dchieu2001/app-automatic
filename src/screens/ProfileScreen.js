@@ -14,6 +14,7 @@ import { theme } from "../core/theme";
 import TextInput from "../components/TextInput";
 import { passwordValidator } from "../helpers/passwordValidator";
 import * as ImagePicker from "expo-image-picker";
+import { useFocusEffect } from '@react-navigation/native';
 
 const ProfileScreen = ({ navigation }) => {
   const [imageFromGellary, setImageFromGellary] = useState(null);
@@ -29,16 +30,6 @@ const ProfileScreen = ({ navigation }) => {
 
   const [chane, setChange] = useState(false);
 
-  const getImageFromDB = async () => {
-    const { data: profile, error } = await supabase
-      .from("profile")
-      .select("*")
-      .eq("uid", currentUser.id);
-      
-      if (profile && profile.length > 0 && profile[0].image_url) {
-        setImageFromGellary(profile[0].image_url);
-      }
-    };
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -137,9 +128,28 @@ const ProfileScreen = ({ navigation }) => {
     // ]);
   };
 
-  useEffect(() => {
-    getImageFromDB();
-  }, [getImageFromDB]);
+  useFocusEffect(
+    React.useCallback(() => {
+      let isActive = true;
+  
+      const getImageFromDB = async () => {
+        const { data: profile, error } = await supabase
+          .from("profile")
+          .select("*")
+          .eq("uid", currentUser.id);
+          
+        if (profile && profile.length > 0 && profile[0].image_url) {
+          setImageFromGellary(profile[0].image_url);
+        }
+      };
+  
+      getImageFromDB();
+  
+      return () => {
+        isActive = false;
+      };
+    }, [currentUser])
+  );
 
   return (
     <SafeAreaView style={styles.container}>

@@ -20,6 +20,7 @@ import { examNameValidator } from "../../helpers/examNameValidator";
 import { supabase } from "../../utils/supabase-service";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { Dropdown } from "react-native-element-dropdown";
+import { useFocusEffect } from '@react-navigation/native';
 
 const ExamDetail = ({ route, navigation }) => {
   const examId = route.params.id;
@@ -133,36 +134,44 @@ const ExamDetail = ({ route, navigation }) => {
     }
   };
 
-  const loadExamDetails = async () => {
-    let { data: exams, error } = await supabase
-      .from("exams")
-      .select(
-        `*,
-            class_id,
-            classes (
-            id, name, class_code
+  useFocusEffect(
+    React.useCallback(() => {
+      let isActive = true;
+  
+      const loadExamDetails = async () => {
+        let { data: exams, error } = await supabase
+          .from("exams")
+          .select(
+            `*,
+                class_id,
+                classes (
+                id, name, class_code
+              )
+            `
           )
-        `
-      )
-      .eq("id", examId)
-      .eq("is_delete", false)
-      .eq("classes.uid", currentUser.id);
-
-    setExam(exams);
-  };
-
-  const isAnswerStudent = async () => {
-    let { data: answer_students, error } = await supabase
-      .from("answer_students")
-      .select("*")
-      .eq("exam_id", examId);
-    answer_students[0] ? setDisable(false) : setDisable(true);
-  };
-
-  useEffect(() => {
-    loadExamDetails();
-    isAnswerStudent();
-  }, [navigation]);
+          .eq("id", examId)
+          .eq("is_delete", false)
+          .eq("classes.uid", currentUser.id);
+    
+        setExam(exams);
+      };
+    
+      const isAnswerStudent = async () => {
+        let { data: answer_students, error } = await supabase
+          .from("answer_students")
+          .select("*")
+          .eq("exam_id", examId);
+        answer_students[0] ? setDisable(false) : setDisable(true);
+      };
+  
+      loadExamDetails();
+      isAnswerStudent();
+  
+      return () => {
+        isActive = false;
+      };
+    }, [currentUser])
+  );
 
   const Edit = () => {
     setVisiBle(true);

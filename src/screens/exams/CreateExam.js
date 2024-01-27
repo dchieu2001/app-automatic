@@ -20,6 +20,8 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { Dropdown } from "react-native-element-dropdown";
 import { dropdownValidator } from "../../helpers/dropdownValidator";
 import { examNameValidator } from "../../helpers/examNameValidator";
+import { useFocusEffect } from '@react-navigation/native';
+
 const CreateExam = ({ navigation }) => {
   const [name, setName] = useState({ value: "", error: "" });
   const [date, setDate] = useState({ value: "", error: "" });
@@ -49,15 +51,6 @@ const CreateExam = ({ navigation }) => {
   const themeContainerStyle = loading
     ? styles.background
     : theme.colors.background;
-
-  const loadClassOfUser = async () => {
-    let { data: classes, error } = await supabase
-      .from("classes")
-      .select("*")
-      .eq("uid", currentUser.id)
-      .eq("is_delete", false);
-    setListDataClassesResponse(classes);
-  };
 
   const menuSchoolYear = () => {
     const schoolYear = new Set(
@@ -103,10 +96,34 @@ const CreateExam = ({ navigation }) => {
     return classCodeListRender;
   };
 
-  useEffect(() => {
-    setLoading(false);
-    loadClassOfUser();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      let isActive = true;
+  
+      const loadClassOfUser = async () => {
+        try {
+          setLoading(true);
+          let { data: classes, error } = await supabase
+            .from("classes")
+            .select("*")
+            .eq("uid", currentUser.id)
+            .eq("is_delete", false);
+          if (classes) {
+            setListDataClassesResponse(classes);
+          }
+        } catch (error) {
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      loadClassOfUser();
+  
+      return () => {
+        isActive = false;
+      };
+    }, [currentUser])
+  );
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);

@@ -19,6 +19,7 @@ import { supabase } from "../../utils/supabase-service";
 import { Dropdown } from "react-native-element-dropdown";
 import { classCodeValidator } from "../../helpers/classCodeValidator";
 import { classNameValidator } from "../../helpers/classNameValidator";
+import { useFocusEffect } from '@react-navigation/native';
 
 const ClassDetail = ({ route, navigation }) => {
   const ref = useRef(null);
@@ -45,58 +46,6 @@ const ClassDetail = ({ route, navigation }) => {
     ? styles.background
     : theme.colors.background;
 
-  // number exams of a class
-  const updateNumberExamOfClass = async () => {
-    try {
-      let { data: exams, error } = await supabase
-        .from("exams")
-        .select()
-        .eq("is_delete", false)
-        .eq("class_id", classId);
-  
-      if (exams && Array.isArray(exams)) {
-        setNumberExam(exams.length);
-      } else {
-        console.error("Invalid data returned:", exams);
-        setNumberExam(0); // Đặt giá trị mặc định là 0 nếu có lỗi hoặc dữ liệu không hợp lệ
-      }
-    } catch (error) {
-      console.error("Error updating number of exams:", error);
-      setNumberExam(0); // Xử lý lỗi và đặt giá trị mặc định là 0
-    }
-  };
-  // number students of a class
-  const updateNumberStudentOfClass = async () => {
-    try {
-      let { data: students, error } = await supabase
-        .from("students")
-        .select()
-        .eq("is_delete", false)
-        .eq("class_id", classId);
-  
-      if (students && Array.isArray(students)) {
-        setNumberStudent(students.length);
-      } else {
-        console.error("Invalid data returned:", students);
-        setNumberStudent(0); // Đặt giá trị mặc định là 0 nếu có lỗi hoặc dữ liệu không hợp lệ
-      }
-    } catch (error) {
-      console.error("Error updating number of students:", error);
-      setNumberStudent(0); // Xử lý lỗi và đặt giá trị mặc định là 0
-    }
-  };
-  
-
-  const loadClassDetail = async () => {
-    let { data: classes, error } = await supabase
-      .from("classes")
-      .select("*")
-      .eq("uid", currentUser.id)
-      .eq("is_delete", false)
-      .eq("id", classId);
-
-    setClasses(classes);
-  };
   const Edit = () => {
     setVisiBle(true);
     let sy = 0;
@@ -250,16 +199,72 @@ const ClassDetail = ({ route, navigation }) => {
     );
   };
 
-  useEffect(() => {
-    loadClassDetail();
-    updateNumberExamOfClass();
-    updateNumberStudentOfClass();
-  }, [
-    navigation,
-    loadClassDetail,
-    updateNumberExamOfClass,
-    updateNumberStudentOfClass,
-  ]);
+  useFocusEffect(
+    React.useCallback(() => {
+      let isActive = true;
+  
+      // number exams of a class
+      const updateNumberExamOfClass = async () => {
+        try {
+          let { data: exams, error } = await supabase
+            .from("exams")
+            .select()
+            .eq("is_delete", false)
+            .eq("class_id", classId);
+      
+          if (exams && Array.isArray(exams)) {
+            setNumberExam(exams.length);
+          } else {
+            console.error("Invalid data returned:", exams);
+            setNumberExam(0); // Đặt giá trị mặc định là 0 nếu có lỗi hoặc dữ liệu không hợp lệ
+          }
+        } catch (error) {
+          console.error("Error updating number of exams:", error);
+          setNumberExam(0); // Xử lý lỗi và đặt giá trị mặc định là 0
+        }
+      };
+      // number students of a class
+      const updateNumberStudentOfClass = async () => {
+        try {
+          let { data: students, error } = await supabase
+            .from("students")
+            .select()
+            .eq("is_delete", false)
+            .eq("class_id", classId);
+      
+          if (students && Array.isArray(students)) {
+            setNumberStudent(students.length);
+          } else {
+            console.error("Invalid data returned:", students);
+            setNumberStudent(0); // Đặt giá trị mặc định là 0 nếu có lỗi hoặc dữ liệu không hợp lệ
+          }
+        } catch (error) {
+          console.error("Error updating number of students:", error);
+          setNumberStudent(0); // Xử lý lỗi và đặt giá trị mặc định là 0
+        }
+      };
+      
+
+      const loadClassDetail = async () => {
+        let { data: classes, error } = await supabase
+          .from("classes")
+          .select("*")
+          .eq("uid", currentUser.id)
+          .eq("is_delete", false)
+          .eq("id", classId);
+
+        setClasses(classes);
+      };
+  
+      loadClassDetail();
+      updateNumberExamOfClass();
+      updateNumberStudentOfClass();
+  
+      return () => {
+        isActive = false;
+      };
+    }, [currentUser])
+  );
 
   const listExamOfClass = () => {
     // navigation.

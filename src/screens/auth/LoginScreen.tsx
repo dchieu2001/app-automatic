@@ -39,9 +39,7 @@ export default function ({
   // const { signIn } = useAuth();
   const themeContainerStyle =
   loading ? styles.background : theme.colors.background;
-  useEffect(()=>{
-    setLoading(false)
-  }, []);
+
   const onLoginPressed = async () => {
     setLoading(true);
     const emailError = emailValidator(email);

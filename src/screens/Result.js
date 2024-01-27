@@ -11,28 +11,36 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { supabase } from '../utils/supabase-service';
+import { useFocusEffect } from '@react-navigation/native';
 
 const Result = ({ route }) => {
   const navigation = useNavigation();
   const class_id = route.params.id;
   const examId = route.params.examId;
-  console.log(examId)
   const [results, setResults] = useState([]);
 
-  const loadResults = async () => {
-    const { data: result, error } = await supabase
-      .from('answer_students')
-      .select('*, students(full_name, student_code)')
-      .eq('students.is_delete', false)
-      .eq('students.class_id', class_id)
-      .eq('exam_id', examId);
-      // console.log("student",result)
-    setResults(result);
-  };
-
-  useEffect(() => {
-    loadResults();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      let isActive = true;
+  
+      const loadResults = async () => {
+        const { data: result, error } = await supabase
+          .from('answer_students')
+          .select('*, students(full_name, student_code)')
+          .eq('students.is_delete', false)
+          .eq('students.class_id', class_id)
+          .eq('exam_id', examId);
+          // console.log("student",result)
+        setResults(result);
+      };
+  
+      loadResults();
+  
+      return () => {
+        isActive = false;
+      };
+    }, [])
+  );
 
   const navigateToDetail = (studentCode, fullName, point,examId,studentid) => {
     navigation.navigate('DetailAnswerStudents', {

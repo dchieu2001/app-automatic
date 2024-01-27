@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { supabase } from "../utils/supabase-service";
+import { useFocusEffect } from '@react-navigation/native';
 
 const DetailAnswerStudents = ({ route, navigation }) => {
   const [dataAns, setDataAns] = useState([]);
@@ -47,14 +48,22 @@ const DetailAnswerStudents = ({ route, navigation }) => {
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      await getAnswered();
-      await getAnswerKeyOfStudent();
-    };
-
-    fetchData();
-  }, [studentid, examId]);
+  useFocusEffect(
+    React.useCallback(() => {
+      let isActive = true;
+  
+      const fetchData = async () => {
+        await getAnswered();
+        await getAnswerKeyOfStudent();
+      };
+  
+      fetchData();
+  
+      return () => {
+        isActive = false;
+      };
+    }, [studentid, examId])
+  );
 
   useEffect(() => {
     if (dataAns.length > 0 && dataAnsST.length > 0) {
