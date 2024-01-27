@@ -39,6 +39,8 @@ const AnswerStudent = ({ route, navigation }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [answerKey, setAnswerKey]= useState(null);
 
+  const [status, requestPermission] = ImagePicker.useCameraPermissions();
+
   const apiURL ="/file/upload-answer-student/";
 
   const { control, handleSubmit, formState: { errors }, reset, getValues } = useForm({
@@ -117,6 +119,16 @@ const AnswerStudent = ({ route, navigation }) => {
   };
 
   // take image from camera
+  const checkCameraPermission = async () => {
+    if (!status?.granted) {
+      const permission = await requestPermission();
+      if (permission.granted) {
+        await takeFromCamera()
+      }
+    } else {
+      await takeFromCamera()
+    };
+  }
   const takeFromCamera = async () => {
     let result = await ImagePicker.launchCameraAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -415,7 +427,7 @@ const AnswerStudent = ({ route, navigation }) => {
       {/* Take from camera */}
       <TouchableOpacity
         // disabled={disabled}
-        onPress={takeFromCamera}
+        onPress={checkCameraPermission}
         style={{
           marginTop: 5,
           flexDirection: "row",

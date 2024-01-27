@@ -40,6 +40,7 @@ const AnswerKey = ({ route, navigation }) => {
   const [answered1, setAnswered1] = useState([]);
   const answered = [];
   let ans = [];
+  const [status, requestPermission] = ImagePicker.useCameraPermissions();
 
   const { control, handleSubmit, formState: { errors }, reset, getValues } = useForm({
     defaultValues: {
@@ -112,6 +113,16 @@ const AnswerKey = ({ route, navigation }) => {
   };
 
   // take image from camera
+  const checkCameraPermission = async () => {
+    if (!status?.granted) {
+      const permission = await requestPermission();
+      if (permission.granted) {
+        await takeFromCamera()
+      }
+    } else {
+      await takeFromCamera()
+    };
+  }
   const takeFromCamera = async () => {
     // try {
     //   const granted = await PermissionsAndroid.request(
@@ -397,7 +408,7 @@ const AnswerKey = ({ route, navigation }) => {
       {/* Take from camera */}
       <TouchableOpacity
         // disabled={disabled}
-        onPress={takeFromCamera}
+        onPress={checkCameraPermission}
         style={{
           marginTop: 5,
           flexDirection: "row",
