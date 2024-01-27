@@ -38,7 +38,7 @@ const ProfileScreen = ({ navigation }) => {
       quality: 1,
     });
 
-    if (!result.cancelled) {
+    if (!result.canceled) {
       setImageFromGellary(result.uri);
       const { err } = await supabase
         .from("profile")

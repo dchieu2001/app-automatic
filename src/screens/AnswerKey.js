@@ -133,10 +133,11 @@ const AnswerKey = ({ route, navigation }) => {
       // aspect: [4, 3],
       quality: 1,
     });
-
+    
     if (!result.canceled) {
+      const selectedImage = result.assets[0];
       setImageFromGellary(null);
-      setImageFromCamera(result.newProperty);
+      setImageFromCamera(selectedImage.uri);
     }
 
     // } catch (err) {

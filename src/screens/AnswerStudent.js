@@ -126,7 +126,9 @@ const AnswerStudent = ({ route, navigation }) => {
     });
 
     if (!result.canceled) {
-      setImageFromCamera(result.uri);
+      const selectedImage = result.assets[0];
+      setImageFromGellary(null);
+      setImageFromCamera(selectedImage.uri);
     }
   };
 
