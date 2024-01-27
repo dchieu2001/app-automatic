@@ -165,17 +165,17 @@ const AnswerStudent = ({ route, navigation }) => {
     }
 
 
-    if (students.length > 0) {
-        const { data: updatedata, error: error1 } = await supabase
+    if (students[0]) {
+        const { error1 } = await supabase
             .from("answer_students")
             .update([
                 {
-                    exam_id: examId,
                     answers: formData.answer.sort(),
                     point: (countCorrectAnswer * scale)
                 },
             ])
-            .eq("student_id", studentId);
+            .eq("student_id", studentId)
+            .eq("exam_id", examId);
               // console.log("data", updatedata)
         // console.log("Updated Data:", data); // Log updated data
         // console.log("ERRRR:", error1); // Log updated data
